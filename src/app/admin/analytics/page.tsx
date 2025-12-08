@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import api from '../../../lib/axios';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart, Pie, Cell } from 'recharts';
 
 interface Analytics {
   totalUsers: number;
@@ -9,6 +10,7 @@ interface Analytics {
   totalEnrollments: number;
   monthlyEnrollments: { _id: number; count: number }[];
   coursePopularity: { title: string; count: number }[];
+  topQuizCompleters: { name: string; totalScore: number }[];
 }
 
 export default function Analytics() {
@@ -48,23 +50,34 @@ export default function Analytics() {
       <div className="mt-8">
         <h2 className="text-2xl font-semibold mb-4">Monthly Enrollments</h2>
         <div className="bg-white p-6 rounded-lg shadow">
-          {analytics.monthlyEnrollments.map((month) => (
-            <div key={month._id} className="flex justify-between">
-              <span>Month {month._id}</span>
-              <span>{month.count}</span>
-            </div>
-          ))}
+          <BarChart width={600} height={300} data={analytics.monthlyEnrollments.map(m => ({ month: `Month ${m._id}`, count: m.count }))}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="month" />
+            <YAxis />
+            <Tooltip />
+            <Bar dataKey="count" fill="#8884d8" />
+          </BarChart>
         </div>
       </div>
       <div className="mt-8">
         <h2 className="text-2xl font-semibold mb-4">Top Courses</h2>
         <div className="bg-white p-6 rounded-lg shadow">
-          {analytics.coursePopularity.map((course) => (
-            <div key={course.title} className="flex justify-between">
-              <span>{course.title}</span>
-              <span>{course.count} enrollments</span>
-            </div>
-          ))}
+          <PieChart width={400} height={400}>
+            <Pie data={analytics.coursePopularity} dataKey="count" nameKey="title" cx="50%" cy="50%" outerRadius={80} fill="#8884d8" label />
+            <Tooltip />
+          </PieChart>
+        </div>
+      </div>
+      <div className="mt-8">
+        <h2 className="text-2xl font-semibold mb-4">Top Quiz Completers</h2>
+        <div className="bg-white p-6 rounded-lg shadow">
+          <BarChart width={600} height={300} data={analytics.topQuizCompleters}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="name" />
+            <YAxis />
+            <Tooltip />
+            <Bar dataKey="totalScore" fill="#82ca9d" />
+          </BarChart>
         </div>
       </div>
     </div>

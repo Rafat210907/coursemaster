@@ -6,6 +6,7 @@ import { fetchCourses } from './store/slices/courseSlice';
 import Link from 'next/link';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
+import { motion } from 'framer-motion';
 
 interface Course {
   _id: string;
@@ -74,8 +75,14 @@ export default function Home() {
       {error && <p className="text-red-500">{error}</p>}
       {!loading && !error && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {courses.map((course: Course) => (
-            <div key={course._id} className="border rounded-lg p-4 shadow">
+          {courses.map((course: Course, index: number) => (
+            <motion.div
+              key={course._id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1 }}
+              className="border rounded-lg p-4 shadow"
+            >
               <h2 className="text-xl font-semibold mb-2">{course.title}</h2>
               <p className="text-gray-600 mb-2">{course.description}</p>
               <p className="text-sm text-gray-500 mb-2">Instructor: {course.instructor}</p>
@@ -83,7 +90,7 @@ export default function Home() {
               <Link href={`/course/${course._id}`} className="bg-blue-500 text-white px-4 py-2 rounded">
                 View Details
               </Link>
-            </div>
+            </motion.div>
           ))}
         </div>
       )}

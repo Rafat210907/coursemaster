@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'next/navigation';
 import { updateProgress } from '../../store/slices/enrollmentSlice';
+import ReactPlayer from 'react-player';
 
 export default function LessonPlayer() {
   const { courseId } = useParams();
@@ -35,15 +36,7 @@ export default function LessonPlayer() {
         <div>
           <h2 className="text-2xl font-semibold mb-4">{lesson.title}</h2>
           <div className="mb-4">
-            <iframe
-              width="560"
-              height="315"
-              src={lesson.videoUrl}
-              title={lesson.title}
-              frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            ></iframe>
+            <ReactPlayer url={lesson.videoUrl} controls width="100%" height="400px" />
           </div>
           <button onClick={handleComplete} className="bg-green-500 text-white px-4 py-2 rounded">
             Mark as Completed
