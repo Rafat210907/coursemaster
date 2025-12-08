@@ -11,11 +11,11 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Course } from '../types';
-import { RootState } from './store/store';
+import { RootState, AppDispatch } from './store/store';
 import { Search, Filter } from 'lucide-react';
 
 export default function Home() {
-  const dispatch = useDispatch<any>();
+  const dispatch = useDispatch<AppDispatch>();
   const { courses, loading, error, totalPages, currentPage } = useSelector((state: RootState) => state.courses);
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('');
@@ -115,6 +115,7 @@ export default function Home() {
                   <CardContent>
                     <div className="space-y-2">
                       <p className="text-sm text-muted-foreground">Instructor: {course.instructor}</p>
+                      <p className="text-sm text-muted-foreground">Duration: {course.duration} hours</p>
                       <div className="flex flex-wrap gap-1">
                         {course.tags.slice(0, 3).map((tag) => (
                           <span key={tag} className="bg-secondary text-secondary-foreground px-2 py-1 rounded-md text-xs">

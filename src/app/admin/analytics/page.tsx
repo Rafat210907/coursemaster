@@ -6,9 +6,7 @@ import { fetchAnalytics } from '../../store/slices/adminSlice';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../components/ui/Card';
 import { RootState, AppDispatch } from '../../store/store';
 import { Users, BookOpen, UserCheck, TrendingUp, Award, Search } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart, Pie, Cell, LineChart, Line, ResponsiveContainer } from 'recharts';
-
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, LineChart, Line, ResponsiveContainer } from 'recharts';
 
 export default function AdminAnalytics() {
   const dispatch = useDispatch<AppDispatch>();
@@ -105,7 +103,7 @@ export default function AdminAnalytics() {
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{analytics.totalUsers || 0}</div>
+              <div className="text-2xl font-bold">{analytics.totalStudents || 0}</div>
               <p className="text-xs text-muted-foreground">
                 Registered users
               </p>
@@ -145,8 +143,8 @@ export default function AdminAnalytics() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {analytics.totalEnrollments && analytics.totalUsers
-                  ? Math.round((analytics.totalEnrollments / analytics.totalUsers) * 100)
+                {analytics.totalEnrollments && analytics.totalStudents
+                  ? Math.round((analytics.totalEnrollments / analytics.totalStudents) * 100)
                   : 0}%
               </div>
               <p className="text-xs text-muted-foreground">
@@ -226,7 +224,7 @@ export default function AdminAnalytics() {
                         <span className="font-medium">{student.name}</span>
                       </div>
                       <span className="text-sm text-muted-foreground">
-                        {student.totalScore} points
+                        {student.completedQuizzes} quizzes completed
                       </span>
                     </div>
                   ))
@@ -248,7 +246,7 @@ export default function AdminAnalytics() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {analytics.topSearchedCourses?.length > 0 ? (
+                {analytics?.topSearchedCourses && analytics.topSearchedCourses.length > 0 ? (
                   analytics.topSearchedCourses.slice(0, 5).map((course, index) => (
                     <div key={index} className="flex items-center justify-between">
                       <div className="flex items-center gap-3">

@@ -33,7 +33,7 @@ export const fetchCourse = createAsyncThunk('courses/fetchCourse', async (id: st
   return response.data;
 });
 
-export const createCourse = createAsyncThunk('courses/createCourse', async (courseData: any) => {
+export const createCourse = createAsyncThunk('courses/createCourse', async (courseData: Omit<Course, '_id' | 'createdAt' | 'averageRating' | 'reviewCount'>) => {
   const response = await api.post('/courses', courseData);
   return response.data;
 });

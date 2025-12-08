@@ -1,15 +1,16 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'next/navigation';
 import { fetchCourse } from '../../store/slices/courseSlice';
-import { enrollCourse } from '../../store/slices/enrollmentSlice';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../components/ui/Card';
+import { enrollCourse, fetchEnrolledCourses } from '../../store/slices/enrollmentSlice';
+import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/Card';
 import { Button } from '../../../components/ui/Button';
 import { RootState, AppDispatch } from '../../store/store';
 import { Course, Review } from '../../../types';
 import { Star, Clock, Users, BookOpen, CheckCircle, MessageSquare } from 'lucide-react';
+import api from '../../../lib/axios';
 
 export default function CourseDetails() {
   const { id } = useParams();
@@ -21,25 +22,26 @@ export default function CourseDetails() {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [newReview, setNewReview] = useState({ rating: 5, comment: '' });
   const [showReviewForm, setShowReviewForm] = useState(false);
+  const [reviewError, setReviewError] = useState('');
+
+  const fetchReviews = useCallback(async () => {
+    try {
+      const response = await api.get(`/reviews/${id}`);
+      setReviews(response.data);
+    } catch (error) {
+      console.error('Error fetching reviews:', error);
+    }
+  }, [id]);
 
   useEffect(() => {
     if (id) {
       dispatch(fetchCourse(id as string));
       fetchReviews();
     }
-  }, [dispatch, id]);
-
-  const fetchReviews = async () => {
-    try {
-      const response = await fetch(`/api/reviews/${id}`);
-      if (response.ok) {
-        const data = await response.json();
-        setReviews(data);
-      }
-    } catch (error) {
-      console.error('Error fetching reviews:', error);
+    if (user) {
+      dispatch(fetchEnrolledCourses());
     }
-  };
+  }, [dispatch, id, fetchReviews, user]);
 
   const handleEnroll = async () => {
     if (!currentCourse) return;
@@ -53,23 +55,26 @@ export default function CourseDetails() {
 
   const handleReviewSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setReviewError('');
+
     try {
-      const response = await fetch('/api/reviews', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ courseId: id, ...newReview }),
-      });
-      if (response.ok) {
-        setNewReview({ rating: 5, comment: '' });
-        setShowReviewForm(false);
-        fetchReviews();
-      }
-    } catch (error) {
+      await api.post('/reviews', { courseId: id, ...newReview });
+      setNewReview({ rating: 5, comment: '' });
+      setShowReviewForm(false);
+      setReviewError('');
+      fetchReviews();
+    } catch (error: unknown) {
       console.error('Error submitting review:', error);
+      const axiosError = error as { response?: { data?: { message?: string } } };
+      setReviewError(axiosError.response?.data?.message || 'Failed to submit review');
     }
   };
 
-  const isEnrolled = enrollments.some(e => e.course._id === currentCourse?._id);
+  const isEnrolled = currentCourse ? enrollments.some(e => {
+    if (!e.course) return false;
+    const courseId = typeof e.course === 'object' ? (e.course as Course)._id : e.course;
+    return courseId === currentCourse._id;
+  }) : false;
 
   if (loading) {
     return (
@@ -122,6 +127,10 @@ export default function CourseDetails() {
                   <BookOpen className="h-4 w-4 text-muted-foreground" />
                   <span className="text-sm">{course.category}</span>
                 </div>
+                <div className="flex items-center gap-1">
+                  <Clock className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm">{course.duration} hours</span>
+                </div>
               </div>
 
               <div className="flex flex-wrap gap-2 mb-6">
@@ -163,7 +172,10 @@ export default function CourseDetails() {
                   Reviews ({reviews.length})
                 </CardTitle>
                 {user && isEnrolled && !showReviewForm && (
-                  <Button variant="outline" onClick={() => setShowReviewForm(true)}>
+                  <Button variant="outline" onClick={() => {
+                    setShowReviewForm(true);
+                    setReviewError('');
+                  }}>
                     Write a Review
                   </Button>
                 )}
@@ -172,6 +184,11 @@ export default function CourseDetails() {
                 {showReviewForm && (
                   <form onSubmit={handleReviewSubmit} className="mb-6 p-4 border rounded-lg">
                     <h3 className="font-semibold mb-4">Write a Review</h3>
+                    {reviewError && (
+                      <div className="mb-4 p-3 bg-destructive/10 border border-destructive/20 rounded-md text-destructive text-sm">
+                        {reviewError}
+                      </div>
+                    )}
                     <div className="mb-4">
                       <label className="block text-sm font-medium mb-2">Rating</label>
                       <select
@@ -205,6 +222,11 @@ export default function CourseDetails() {
                   {reviews.length > 0 ? (
                     reviews.map((review) => (
                       <div key={review._id} className="border-b pb-4 last:border-b-0">
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className="font-semibold text-sm">
+                            {typeof review.user === 'object' ? review.user.name : 'Anonymous'}
+                          </div>
+                        </div>
                         <div className="flex items-center gap-2 mb-2">
                           <div className="flex">
                             {[...Array(5)].map((_, i) => (

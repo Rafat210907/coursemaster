@@ -2,18 +2,18 @@
 
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchEnrollments, updateEnrollmentStatus } from '../../store/slices/adminSlice';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../components/ui/Card';
+import { fetchEnrollments, updateEnrollmentStatus, cleanupOrphanedEnrollments } from '../../store/slices/adminSlice';
+import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/Card';
 import { Button } from '../../../components/ui/Button';
 import { RootState, AppDispatch } from '../../store/store';
-import { Enrollment } from '../../../types';
-import { UserCheck, UserX, Clock, CheckCircle, Users, BookOpen } from 'lucide-react';
+import { User, Course } from '../../../types';
+import { UserCheck, UserX, Clock, CheckCircle, Users } from 'lucide-react';
 
 export default function AdminEnrollments() {
   const dispatch = useDispatch<AppDispatch>();
   const { enrollments, loading, error } = useSelector((state: RootState) => state.admin);
   const { user } = useSelector((state: RootState) => state.auth);
-  const [filter, setFilter] = useState<'all' | 'pending' | 'approved' | 'completed'>('all');
+  const [filter, setFilter] = useState<'all' | 'pending' | 'approved' | 'rejected' | 'active' | 'completed' | 'dropped'>('all');
 
   useEffect(() => {
     if (user?.role === 'admin') {
@@ -42,8 +42,12 @@ export default function AdminEnrollments() {
         return <Clock className="h-4 w-4 text-yellow-500" />;
       case 'rejected':
         return <UserX className="h-4 w-4 text-red-500" />;
+      case 'active':
+        return <UserCheck className="h-4 w-4 text-blue-500" />;
       case 'completed':
         return <CheckCircle className="h-4 w-4 text-blue-500" />;
+      case 'dropped':
+        return <UserX className="h-4 w-4 text-gray-500" />;
       default:
         return <Clock className="h-4 w-4 text-gray-500" />;
     }
@@ -57,8 +61,12 @@ export default function AdminEnrollments() {
         return 'bg-yellow-100 text-yellow-800';
       case 'rejected':
         return 'bg-red-100 text-red-800';
-      case 'completed':
+      case 'active':
         return 'bg-blue-100 text-blue-800';
+      case 'completed':
+        return 'bg-purple-100 text-purple-800';
+      case 'dropped':
+        return 'bg-gray-100 text-gray-800';
       default:
         return 'bg-gray-100 text-gray-800';
     }
@@ -81,7 +89,15 @@ export default function AdminEnrollments() {
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold">Enrollment Management</h1>
           <div className="flex gap-2">
-            {(['all', 'pending', 'approved', 'completed'] as const).map((status) => (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => dispatch(cleanupOrphanedEnrollments())}
+              className="text-red-600 border-red-600 hover:bg-red-50"
+            >
+              Cleanup Orphaned
+            </Button>
+            {(['all', 'pending', 'approved', 'rejected', 'active', 'completed', 'dropped'] as const).map((status) => (
               <Button
                 key={status}
                 variant={filter === status ? 'default' : 'outline'}
@@ -119,7 +135,7 @@ export default function AdminEnrollments() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {enrollments.filter(e => e.status === 'active').length}
+                {enrollments.filter(e => e.status === 'pending').length}
               </div>
             </CardContent>
           </Card>
@@ -131,19 +147,19 @@ export default function AdminEnrollments() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {enrollments.filter(e => e.status === 'completed').length}
+                {enrollments.filter(e => e.status === 'approved').length}
               </div>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Completed</CardTitle>
-              <BookOpen className="h-4 w-4 text-blue-500" />
+              <CardTitle className="text-sm font-medium">Rejected</CardTitle>
+              <UserX className="h-4 w-4 text-red-500" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {enrollments.filter(e => e.status === 'completed').length}
+                {enrollments.filter(e => e.status === 'rejected').length}
               </div>
             </CardContent>
           </Card>
@@ -200,11 +216,11 @@ export default function AdminEnrollments() {
                         </p>
                       </div>
 
-                      {enrollment.status === 'active' && (
+                      {enrollment.status === 'pending' && (
                         <div className="flex gap-2">
                           <Button
                             size="sm"
-                            onClick={() => handleStatusUpdate(enrollment._id, 'completed')}
+                            onClick={() => handleStatusUpdate(enrollment._id, 'approved')}
                             disabled={loading}
                           >
                             <UserCheck className="h-4 w-4 mr-1" />

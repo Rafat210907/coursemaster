@@ -7,8 +7,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../..
 import { Button } from '../../../components/ui/Button';
 import { Input } from '../../../components/ui/Input';
 import { RootState, AppDispatch } from '../../store/store';
-import { Assignment } from '../../../types';
-import { FileText, User, BookOpen, CheckCircle, Clock, AlertCircle } from 'lucide-react';
+import { User, Lesson, Course } from '../../../types';
+import { FileText, User as UserIcon, BookOpen, CheckCircle, Clock, AlertCircle } from 'lucide-react';
 
 export default function AdminAssignments() {
   const dispatch = useDispatch<AppDispatch>();
@@ -139,13 +139,13 @@ export default function AdminAssignments() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <h4 className="font-medium mb-2 flex items-center gap-2">
-                        <User className="h-4 w-4" />
+                        <UserIcon className="h-4 w-4" />
                         Student Information
                       </h4>
                       <div className="space-y-1 text-sm">
                         <p><strong>Name:</strong> {(assignment.student as User)?.name || 'Unknown'}</p>
                         <p><strong>Email:</strong> {(assignment.student as User)?.email || 'No email'}</p>
-                        <p><strong>Submitted:</strong> {new Date(assignment.submittedAt).toLocaleDateString()}</p>
+                        <p><strong>Submitted:</strong> {assignment.submittedAt ? new Date(assignment.submittedAt).toLocaleDateString() : 'Not submitted'}</p>
                       </div>
                     </div>
 
@@ -155,8 +155,8 @@ export default function AdminAssignments() {
                         Assignment Details
                       </h4>
                       <div className="space-y-1 text-sm">
-                        <p><strong>Course:</strong> {assignment.course?.title || 'Unknown'}</p>
-                        <p><strong>Lesson:</strong> {assignment.lesson?.title || 'Unknown'}</p>
+                        <p><strong>Course:</strong> {(assignment.course as Course)?.title || 'Unknown'}</p>
+                        <p><strong>Lesson:</strong> {(assignment.lesson as Lesson)?.title || 'Unknown'}</p>
                         <p><strong>Due Date:</strong> {assignment.dueDate ? new Date(assignment.dueDate).toLocaleDateString() : 'No due date'}</p>
                       </div>
                     </div>
@@ -179,7 +179,7 @@ export default function AdminAssignments() {
                                 className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary rounded text-xs hover:bg-primary/20 transition-colors"
                               >
                                 <FileText className="h-3 w-3" />
-                                {attachment.name}
+                                {attachment.split('/').pop() || 'File'}
                               </a>
                             ))}
                           </div>
@@ -238,7 +238,7 @@ export default function AdminAssignments() {
                         </div>
                         <div className="flex gap-2">
                           <Button
-                            onClick={() => handleGradeSubmit(assignment._id, assignment.student._id)}
+                            onClick={() => handleGradeSubmit(assignment._id, (assignment.student as User)?._id)}
                             disabled={loading}
                           >
                             Submit Grade

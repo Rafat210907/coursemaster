@@ -7,7 +7,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../..
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { RootState, AppDispatch } from '../store/store';
-import { User, Camera, Mail, User as UserIcon, Calendar, Shield } from 'lucide-react';
+import { Camera, User as UserIcon, Calendar, Shield } from 'lucide-react';
+import Image from 'next/image';
 
 export default function Profile() {
   const dispatch = useDispatch<AppDispatch>();
@@ -24,6 +25,7 @@ export default function Profile() {
 
   useEffect(() => {
     if (user) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFormData({
         name: user.name || '',
         email: user.email || '',
@@ -76,7 +78,7 @@ export default function Profile() {
     if (!validateForm()) return;
 
     try {
-      const updateData: any = {
+      const updateData: { name?: string; email?: string; currentPassword?: string; newPassword?: string } = {
         name: formData.name,
         email: formData.email,
       };
@@ -94,9 +96,10 @@ export default function Profile() {
         newPassword: '',
         confirmPassword: '',
       });
-    } catch (error: any) {
-      if (error.response?.data?.message) {
-        setErrors({ general: error.response.data.message });
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      if (err.response?.data?.message) {
+        setErrors({ general: err.response.data.message });
       } else {
         setErrors({ general: 'Failed to update profile' });
       }
@@ -153,9 +156,11 @@ export default function Profile() {
                 <CardContent className="p-6">
                   <div className="text-center">
                     <div className="relative w-24 h-24 mx-auto mb-4">
-                      <img
+                      <Image
                         src={user.avatar || gravatarUrl}
                         alt="Profile"
+                        width={96}
+                        height={96}
                         className="w-full h-full rounded-full object-cover"
                       />
                       {isEditing && (
@@ -191,7 +196,7 @@ export default function Profile() {
                     <div>
                       <p className="text-sm font-medium">Member since</p>
                       <p className="text-sm text-muted-foreground">
-                        {new Date(user.createdAt || Date.now()).toLocaleDateString()}
+                        {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'Unknown'}
                       </p>
                     </div>
                   </div>

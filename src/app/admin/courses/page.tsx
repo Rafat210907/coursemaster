@@ -8,7 +8,8 @@ import { Button } from '../../../components/ui/Button';
 import { Input } from '../../../components/ui/Input';
 import { RootState, AppDispatch } from '../../store/store';
 import { Course } from '../../../types';
-import { Plus, Edit, Trash2, BookOpen, Users, DollarSign } from 'lucide-react';
+import { Plus, Edit, Trash2, BookOpen, Users, DollarSign, Star, Clock } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 export default function AdminCourses() {
   const dispatch = useDispatch<AppDispatch>();
@@ -20,6 +21,7 @@ export default function AdminCourses() {
     title: '',
     description: '',
     price: 0,
+    duration: 0,
     category: '',
     instructor: '',
     tags: '',
@@ -34,10 +36,50 @@ export default function AdminCourses() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validation
+    if (!formData.title.trim()) {
+      toast.error('Title is required');
+      return;
+    }
+    if (formData.title.trim().length < 3) {
+      toast.error('Title must be at least 3 characters long');
+      return;
+    }
+    if (!formData.description.trim()) {
+      toast.error('Description is required');
+      return;
+    }
+    if (formData.description.trim().length < 10) {
+      toast.error('Description must be at least 10 characters long');
+      return;
+    }
+    if (formData.price <= 0) {
+      toast.error('Price must be greater than 0');
+      return;
+    }
+    if (formData.duration <= 0) {
+      toast.error('Duration must be greater than 0');
+      return;
+    }
+    if (!formData.category.trim()) {
+      toast.error('Category is required');
+      return;
+    }
+    if (!formData.instructor.trim()) {
+      toast.error('Instructor is required');
+      return;
+    }
+
     const courseData = {
-      ...formData,
-      tags: formData.tags.split(',').map(tag => tag.trim()),
-      syllabus: formData.syllabus.filter(item => item.title && item.content),
+      title: formData.title.trim(),
+      description: formData.description.trim(),
+      price: formData.price,
+      duration: formData.duration,
+      category: formData.category.trim(),
+      instructor: formData.instructor.trim(),
+      tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0),
+      syllabus: formData.syllabus.filter(item => item.title.trim().length > 0 && item.content.trim().length > 0),
     };
 
     try {
@@ -48,6 +90,16 @@ export default function AdminCourses() {
       }
       setShowForm(false);
       setEditingCourse(null);
+      setFormData({
+        title: '',
+        description: '',
+        price: 0,
+        duration: 0,
+        category: '',
+        instructor: '',
+        tags: '',
+        syllabus: [{ title: '', content: '' }],
+      });
       resetForm();
     } catch (error) {
       console.error('Error saving course:', error);
@@ -60,6 +112,7 @@ export default function AdminCourses() {
       title: course.title,
       description: course.description,
       price: course.price,
+      duration: course.duration,
       category: course.category,
       instructor: course.instructor,
       tags: course.tags.join(', '),
@@ -83,6 +136,7 @@ export default function AdminCourses() {
       title: '',
       description: '',
       price: 0,
+      duration: 0,
       category: '',
       instructor: '',
       tags: '',
@@ -132,109 +186,217 @@ export default function AdminCourses() {
         )}
 
         {showForm && (
-          <Card className="mb-8">
-            <CardHeader>
-              <CardTitle>{editingCourse ? 'Edit Course' : 'Add New Course'}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Title</label>
-                    <Input
-                      value={formData.title}
-                      onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Category</label>
-                    <Input
-                      value={formData.category}
-                      onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium mb-2">Description</label>
-                  <textarea
-                    value={formData.description}
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    className="w-full border border-input bg-background px-3 py-2 rounded-md min-h-[100px]"
-                    required
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Price ($)</label>
-                    <Input
-                      type="number"
-                      value={formData.price}
-                      onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Instructor</label>
-                    <Input
-                      value={formData.instructor}
-                      onChange={(e) => setFormData({ ...formData, instructor: e.target.value })}
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium mb-2">Tags (comma-separated)</label>
-                  <Input
-                    value={formData.tags}
-                    onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
-                    placeholder="javascript, react, web-development"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium mb-2">Syllabus</label>
-                  {formData.syllabus.map((item, index) => (
-                    <div key={index} className="mb-4 p-4 border rounded-md">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-2">
-                        <Input
-                          placeholder="Section title"
-                          value={item.title}
-                          onChange={(e) => updateSyllabusItem(index, 'title', e.target.value)}
-                        />
-                      </div>
-                      <textarea
-                        placeholder="Section content"
-                        value={item.content}
-                        onChange={(e) => updateSyllabusItem(index, 'content', e.target.value)}
-                        className="w-full border border-input bg-background px-3 py-2 rounded-md min-h-[60px]"
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            {/* Left Side - Form */}
+            <Card>
+              <CardHeader>
+                <CardTitle>{editingCourse ? 'Edit Course' : 'Add New Course'}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Title</label>
+                      <Input
+                        value={formData.title}
+                        onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                        required
                       />
                     </div>
-                  ))}
-                  <Button type="button" variant="outline" onClick={addSyllabusItem}>
-                    Add Section
-                  </Button>
-                </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Category</label>
+                      <Input
+                        value={formData.category}
+                        onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                        required
+                      />
+                    </div>
+                  </div>
 
-                <div className="flex gap-2">
-                  <Button type="submit" disabled={loading}>
-                    {editingCourse ? 'Update Course' : 'Create Course'}
-                  </Button>
-                  <Button type="button" variant="outline" onClick={() => {
-                    setShowForm(false);
-                    setEditingCourse(null);
-                    resetForm();
-                  }}>
-                    Cancel
-                  </Button>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Description</label>
+                    <textarea
+                      value={formData.description}
+                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                      className="w-full border border-input bg-background px-3 py-2 rounded-md min-h-[100px]"
+                      required
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Price ($)</label>
+                      <Input
+                        type="number"
+                        value={formData.price}
+                        onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Duration (hours)</label>
+                      <Input
+                        type="number"
+                        value={formData.duration}
+                        onChange={(e) => setFormData({ ...formData, duration: Number(e.target.value) })}
+                        required
+                        min="0"
+                        step="0.5"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Instructor</label>
+                      <Input
+                        value={formData.instructor}
+                        onChange={(e) => setFormData({ ...formData, instructor: e.target.value })}
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Tags (comma-separated)</label>
+                    <Input
+                      value={formData.tags}
+                      onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
+                      placeholder="javascript, react, web-development"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Syllabus</label>
+                    {formData.syllabus.map((item, index) => (
+                      <div key={index} className="mb-4 p-4 border rounded-md">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-2">
+                          <Input
+                            placeholder="Section title"
+                            value={item.title}
+                            onChange={(e) => updateSyllabusItem(index, 'title', e.target.value)}
+                          />
+                        </div>
+                        <textarea
+                          placeholder="Section content"
+                          value={item.content}
+                          onChange={(e) => updateSyllabusItem(index, 'content', e.target.value)}
+                          className="w-full border border-input bg-background px-3 py-2 rounded-md min-h-[60px]"
+                        />
+                      </div>
+                    ))}
+                    <Button type="button" variant="outline" onClick={addSyllabusItem}>
+                      Add Section
+                    </Button>
+                  </div>
+
+                  <div className="flex gap-2">
+                    <Button type="submit" disabled={loading}>
+                      {editingCourse ? 'Update Course' : 'Create Course'}
+                    </Button>
+                    <Button type="button" variant="outline" onClick={() => {
+                      setShowForm(false);
+                      setEditingCourse(null);
+                      resetForm();
+                    }}>
+                      Cancel
+                    </Button>
+                  </div>
+                </form>
+              </CardContent>
+            </Card>
+
+            {/* Right Side - Preview */}
+            <Card className="sticky top-4">
+              <CardHeader>
+                <CardTitle>Preview</CardTitle>
+                <CardDescription>How the course will appear to students</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-6">
+                  {/* Course Header */}
+                  <div>
+                    <h1 className="text-3xl font-bold mb-4">{formData.title || 'Course Title'}</h1>
+                    <p className="text-xl text-muted-foreground mb-4">{formData.description || 'Course description will appear here...'}</p>
+
+                    <div className="flex flex-wrap items-center gap-4 mb-6">
+                      <div className="flex items-center gap-1">
+                        <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                        <span className="text-sm">N/A</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <span className="text-sm">💬</span>
+                        <span className="text-sm">0 reviews</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <BookOpen className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-sm">{formData.category || 'Category'}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Clock className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-sm">{formData.duration ? `${formData.duration} hours` : 'Duration'}</span>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-wrap gap-2 mb-6">
+                      {formData.tags ? formData.tags.split(',').map((tag, index) => (
+                        <span key={index} className="bg-secondary text-secondary-foreground px-3 py-1 rounded-full text-sm">
+                          {tag.trim()}
+                        </span>
+                      )) : (
+                        <span className="bg-secondary text-secondary-foreground px-3 py-1 rounded-full text-sm">
+                          Sample Tag
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Syllabus Preview */}
+                  {formData.syllabus.some(item => item.title || item.content) && (
+                    <div>
+                      <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                        <BookOpen className="h-5 w-5" />
+                        Course Syllabus
+                      </h2>
+                      <div className="space-y-4">
+                        {formData.syllabus.filter(item => item.title || item.content).map((item, index) => (
+                          <div key={index} className="border-l-2 border-primary pl-4">
+                            <h3 className="font-semibold mb-2">{item.title || 'Section Title'}</h3>
+                            <p className="text-muted-foreground text-sm">{item.content || 'Section content will appear here...'}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Sidebar Preview */}
+                  <div className="border-t pt-6">
+                    <div className="text-center mb-6">
+                      <div className="text-3xl font-bold mb-2">${formData.price || '0'}</div>
+                      <div className="text-muted-foreground">One-time payment</div>
+                    </div>
+
+                    <div className="bg-muted/50 p-4 rounded-lg mb-6">
+                      <div className="text-center text-sm font-medium text-green-600 mb-2">
+                        ✓ Already Enrolled
+                      </div>
+                      <p className="text-xs text-muted-foreground text-center">
+                        Preview shows enrolled state
+                      </p>
+                    </div>
+
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2 text-sm">
+                        <Users className="h-4 w-4 text-muted-foreground" />
+                        <span>Instructor: {formData.instructor || 'Instructor Name'}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm">
+                        <Clock className="h-4 w-4 text-muted-foreground" />
+                        <span>Self-paced learning</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </form>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </div>
         )}
 
         {loading ? (
@@ -268,6 +430,10 @@ export default function AdminCourses() {
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <Users className="h-4 w-4" />
                       <span>{course.lessons.length} lessons</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Clock className="h-4 w-4" />
+                      <span>{course.duration} hours</span>
                     </div>
                     <div className="flex items-center gap-2 text-lg font-bold">
                       <DollarSign className="h-4 w-4" />

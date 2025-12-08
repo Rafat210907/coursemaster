@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import api from '@/lib/axios';
 import { Course, Enrollment, Assignment, Analytics } from '@/types';
+import toast from 'react-hot-toast';
 
 interface AdminState {
   courses: Course[];
@@ -45,8 +46,13 @@ export const fetchEnrollments = createAsyncThunk('admin/fetchEnrollments', async
   return response.data;
 });
 
-export const updateEnrollmentStatus = createAsyncThunk('admin/updateEnrollmentStatus', async ({ id, status }: { id: string; status: 'approved' | 'rejected' }) => {
+export const updateEnrollmentStatus = createAsyncThunk('admin/updateEnrollmentStatus', async ({ id, status }: { id: string; status: 'pending' | 'approved' | 'rejected' | 'active' | 'completed' | 'dropped' }) => {
   const response = await api.put(`/enrollments/${id}/status`, { status });
+  return response.data;
+});
+
+export const cleanupOrphanedEnrollments = createAsyncThunk('admin/cleanupEnrollments', async () => {
+  const response = await api.delete('/enrollments/cleanup');
   return response.data;
 });
 
@@ -80,23 +86,44 @@ const adminSlice = createSlice({
       })
       .addCase(fetchAllCourses.fulfilled, (state, action) => {
         state.loading = false;
-        state.courses = action.payload;
+        state.courses = action.payload.courses;
       })
       .addCase(fetchAllCourses.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || 'Failed to fetch courses';
       })
       .addCase(createCourse.fulfilled, (state, action) => {
+        state.loading = false;
         state.courses.push(action.payload);
+        toast.success('Course created successfully!');
+      })
+      .addCase(createCourse.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || 'Failed to create course';
+        toast.error(state.error);
       })
       .addCase(updateCourse.fulfilled, (state, action) => {
+        state.loading = false;
         const index = state.courses.findIndex(c => c._id === action.payload._id);
         if (index !== -1) {
           state.courses[index] = action.payload;
         }
+        toast.success('Course updated successfully!');
+      })
+      .addCase(updateCourse.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || 'Failed to update course';
+        toast.error(state.error);
       })
       .addCase(deleteCourse.fulfilled, (state, action) => {
+        state.loading = false;
         state.courses = state.courses.filter(c => c._id !== action.payload);
+        toast.success('Course deleted successfully!');
+      })
+      .addCase(deleteCourse.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || 'Failed to delete course';
+        toast.error(state.error);
       })
       .addCase(fetchEnrollments.fulfilled, (state, action) => {
         state.enrollments = action.payload;
@@ -112,6 +139,12 @@ const adminSlice = createSlice({
       })
       .addCase(fetchAnalytics.fulfilled, (state, action) => {
         state.analytics = action.payload;
+      })
+      .addCase(cleanupOrphanedEnrollments.fulfilled, (_state, action) => {
+        toast.success(action.payload.message);
+      })
+      .addCase(cleanupOrphanedEnrollments.rejected, (_state, _action) => {
+        toast.error('Failed to cleanup orphaned enrollments');
       });
   },
 });

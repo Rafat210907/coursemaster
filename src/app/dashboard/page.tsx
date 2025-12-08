@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { RootState, AppDispatch } from '../store/store';
-import { Enrollment } from '../../types';
+import { Enrollment, Course } from '../../types';
 import { BookOpen, TrendingUp, Clock, Award } from 'lucide-react';
 
 export default function Dashboard() {
@@ -55,6 +55,9 @@ export default function Dashboard() {
   const completedCourses = enrollments.filter(e => e.status === 'completed').length;
   const inProgressCourses = enrollments.filter(e => e.status === 'active').length;
   const totalProgress = enrollments.reduce((sum, e) => sum + e.progress, 0) / enrollments.length || 0;
+
+  // Filter out enrollments with missing or invalid courses
+  const validEnrollments = enrollments.filter(enrollment => enrollment.course && (enrollment.course as Course)?.title);
 
   return (
     <div className="min-h-screen bg-background">
@@ -118,13 +121,13 @@ export default function Dashboard() {
         {/* Enrolled Courses */}
         <div className="mb-8">
           <h2 className="text-2xl font-bold mb-6">My Courses</h2>
-          {enrollments.length > 0 ? (
+          {validEnrollments.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {enrollments.map((enrollment: Enrollment) => (
+              {validEnrollments.map((enrollment: Enrollment) => (
                 <Card key={enrollment._id} className="hover:shadow-lg transition-shadow">
                   <CardHeader>
-                    <CardTitle className="line-clamp-2">{enrollment.course.title}</CardTitle>
-                    <CardDescription>{enrollment.course.instructor}</CardDescription>
+                    <CardTitle className="line-clamp-2">{(enrollment.course as Course)?.title || 'Unknown Course'}</CardTitle>
+                    <CardDescription>{(enrollment.course as Course)?.instructor || 'Unknown Instructor'}</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
@@ -148,8 +151,8 @@ export default function Dashboard() {
                     </div>
                   </CardContent>
                   <div className="p-6 pt-0">
-                    <Link href={`/lesson/${enrollment.course._id}`}>
-                      <Button className="w-full">
+                    <Link href={(enrollment.course as Course) ? `/lesson/${(enrollment.course as Course)._id}` : '#'}>
+                      <Button className="w-full" disabled={!(enrollment.course as Course)}>
                         {enrollment.progress === 100 ? 'Review Course' : 'Continue Learning'}
                       </Button>
                     </Link>

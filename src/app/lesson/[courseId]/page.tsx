@@ -1,15 +1,14 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'next/navigation';
 import { fetchEnrolledCourses, updateProgress } from '../../store/slices/enrollmentSlice';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../components/ui/Card';
 import { Button } from '../../../components/ui/Button';
 import { RootState, AppDispatch } from '../../store/store';
-import { Enrollment, Lesson, Assignment, Quiz } from '../../../types';
-import ReactPlayer from 'react-player';
-import { Play, CheckCircle, FileText, HelpCircle, ChevronRight } from 'lucide-react';
+import { Lesson, Assignment, Quiz } from '../../../types';
+import { Play, CheckCircle, FileText, HelpCircle } from 'lucide-react';
 
 const getYouTubeId = (url: string) => {
   const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
@@ -31,16 +30,9 @@ export default function LessonPage() {
   const [quizSubmitted, setQuizSubmitted] = useState(false);
   const [quizScore, setQuizScore] = useState(0);
 
-  const enrollment = enrollments.find(e => (typeof e.course === 'object' ? e.course._id : e.course) === courseId);
+  const enrollment = enrollments.find(e => (e.course && typeof e.course === 'object' ? e.course._id : e.course) === courseId);
 
-  useEffect(() => {
-    if (user && courseId) {
-      dispatch(fetchEnrolledCourses());
-      fetchCourseData();
-    }
-  }, [dispatch, user, courseId]);
-
-  const fetchCourseData = async () => {
+  const fetchCourseData = useCallback(async () => {
     try {
       const [lessonsRes, assignmentsRes, quizzesRes] = await Promise.all([
         fetch(`/api/lessons/course/${courseId}`),
@@ -68,7 +60,14 @@ export default function LessonPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [courseId]);
+
+  useEffect(() => {
+    if (user && courseId) {
+      dispatch(fetchEnrolledCourses());
+      fetchCourseData();
+    }
+  }, [dispatch, user, courseId, fetchCourseData]);
 
   const handleLessonComplete = async (lessonId: string) => {
     if (!enrollment) return;

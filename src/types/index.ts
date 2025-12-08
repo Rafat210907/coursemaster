@@ -4,6 +4,7 @@ export interface User {
   email: string;
   role: 'student' | 'admin';
   enrolledCourses: string[];
+  avatar?: string;
   createdAt: string;
 }
 
@@ -13,6 +14,7 @@ export interface Course {
   description: string;
   syllabus: { title: string; content: string }[];
   price: number;
+  duration: number;
   tags: string[];
   category: string;
   instructor: string;
@@ -31,7 +33,7 @@ export interface Enrollment {
   progress: number;
   completedLessons: { lesson: string; completedAt: string }[];
   enrolledAt: string;
-  status: 'active' | 'completed' | 'dropped' | 'pending' | 'approved';
+  status: 'active' | 'completed' | 'dropped' | 'pending' | 'approved' | 'rejected';
 }
 
 export interface Lesson {
@@ -101,7 +103,7 @@ export interface Batch {
 export interface Review {
   _id: string;
   course: string;
-  user: string;
+  user: string | { name: string };
   rating: number;
   comment: string;
   createdAt: string;

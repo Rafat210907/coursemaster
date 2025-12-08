@@ -34,8 +34,28 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <Providers>
             <Header />
-            {children}
-            <Toaster position="top-right" />
+            <main className="pt-16">
+              {children}
+            </main>
+            <Toaster 
+              position="top-right" 
+              toastOptions={{
+                duration: 4000,
+                style: {
+                  fontSize: '16px',
+                  padding: '16px 20px',
+                  minWidth: '300px',
+                },
+                error: {
+                  style: {
+                    fontSize: '16px',
+                    padding: '16px 20px',
+                    minWidth: '350px',
+                    fontWeight: '500',
+                  },
+                },
+              }}
+            />
           </Providers>
         </ThemeProvider>
       </body>

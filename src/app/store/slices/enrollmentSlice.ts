@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import api from '@/lib/axios';
-import { Enrollment, Course } from '@/types';
+import { Enrollment } from '@/types';
 
 interface EnrollmentState {
   enrollments: Enrollment[];
@@ -41,11 +41,29 @@ const enrollmentSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
+      .addCase(enrollCourse.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
       .addCase(enrollCourse.fulfilled, (state, action) => {
+        state.loading = false;
         state.enrollments.push(action.payload);
       })
+      .addCase(enrollCourse.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || 'Failed to enroll';
+      })
+      .addCase(fetchEnrolledCourses.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
       .addCase(fetchEnrolledCourses.fulfilled, (state, action) => {
+        state.loading = false;
         state.enrollments = action.payload;
+      })
+      .addCase(fetchEnrolledCourses.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || 'Failed to fetch enrollments';
       })
       .addCase(updateProgress.fulfilled, (state, action) => {
         const index = state.enrollments.findIndex(e => e._id === action.payload._id);

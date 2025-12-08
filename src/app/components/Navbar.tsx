@@ -2,11 +2,12 @@
 
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../store/slices/authSlice';
+import { RootState, AppDispatch } from '../store/store';
 import Link from 'next/link';
 
 export default function Navbar() {
-  const dispatch = useDispatch<any>();
-  const { user } = useSelector((state: any) => state.auth);
+  const dispatch = useDispatch<AppDispatch>();
+  const { user } = useSelector((state: RootState) => state.auth);
 
   const handleLogout = () => {
     dispatch(logout());
