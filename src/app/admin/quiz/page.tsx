@@ -20,11 +20,11 @@ export default function QuizBuilder() {
 
   const updateQuestion = (index: number, field: string, value: string | number | string[]) => {
     const newQuestions = [...questions];
-    if (field === 'question') {
+    if (field === 'question' && typeof value === 'string') {
       newQuestions[index].question = value;
-    } else if (field === 'option') {
+    } else if (field === 'option' && Array.isArray(value)) {
       newQuestions[index].options = value;
-    } else if (field === 'correctAnswer') {
+    } else if (field === 'correctAnswer' && typeof value === 'number') {
       newQuestions[index].correctAnswer = value;
     }
     setQuestions(newQuestions);

@@ -80,7 +80,8 @@ export default function LessonPlayer() {
         <div>
           <h2 className="text-2xl font-semibold mb-4">{lesson.title}</h2>
           <div className="mb-4">
-            <ReactPlayer url={lesson.videoUrl} controls width="100%" height="400px" />
+            {/* @ts-ignore */}
+            <ReactPlayer url={lesson.videoUrl as string} controls width="100%" height="400px" />
           </div>
           <button onClick={handleComplete} className="bg-green-500 text-white px-4 py-2 rounded">
             Mark as Completed
