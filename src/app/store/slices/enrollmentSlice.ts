@@ -1,22 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import api from '@/lib/axios';
-
-interface CompletedLesson {
-  lesson: string;
-  completedAt: string;
-}
-
-interface Enrollment {
-  _id: string;
-  course: Course;
-  progress: number;
-  completedLessons: CompletedLesson[];
-}
-
-interface Course {
-  _id: string;
-  title: string;
-}
+import { Enrollment, Course } from '@/types';
 
 interface EnrollmentState {
   enrollments: Enrollment[];

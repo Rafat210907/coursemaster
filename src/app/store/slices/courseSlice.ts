@@ -1,15 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import api from '@/lib/axios';
-
-interface Course {
-  _id: string;
-  title: string;
-  description: string;
-  price: number;
-  category: string;
-  instructor: string;
-  tags: string[];
-}
+import { Course } from '@/types';
 
 interface CourseState {
   courses: Course[];

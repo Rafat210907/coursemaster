@@ -3,128 +3,332 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'next/navigation';
-import { updateProgress } from '../../store/slices/enrollmentSlice';
+import { fetchEnrolledCourses, updateProgress } from '../../store/slices/enrollmentSlice';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../components/ui/Card';
+import { Button } from '../../../components/ui/Button';
+import { RootState, AppDispatch } from '../../store/store';
+import { Enrollment, Lesson, Assignment, Quiz } from '../../../types';
 import ReactPlayer from 'react-player';
-import api from '../../../lib/axios';
+import { Play, CheckCircle, FileText, HelpCircle, ChevronRight } from 'lucide-react';
 
-interface Quiz {
-  _id: string;
-  title: string;
-  questions: {
-    question: string;
-    options: string[];
-    correctAnswer: number;
-  }[];
-}
+const getYouTubeId = (url: string) => {
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+  const match = url.match(regExp);
+  return match && match[2].length === 11 ? match[2] : null;
+};
 
-export default function LessonPlayer() {
+export default function LessonPage() {
   const { courseId } = useParams();
-  const dispatch = useDispatch<any>();
-  const { enrollments } = useSelector((state: any) => state.enrollments);
-  const [currentLesson, setCurrentLesson] = useState(0);
-  const [quiz, setQuiz] = useState<Quiz | null>(null);
-  const [answers, setAnswers] = useState<number[]>([]);
+  const dispatch = useDispatch<AppDispatch>();
+  const { enrollments } = useSelector((state: RootState) => state.enrollments);
+  const { user } = useSelector((state: RootState) => state.auth);
+  const [selectedLesson, setSelectedLesson] = useState<Lesson | null>(null);
+  const [lessons, setLessons] = useState<Lesson[]>([]);
+  const [assignments, setAssignments] = useState<Assignment[]>([]);
+  const [quizzes, setQuizzes] = useState<Quiz[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [quizAnswers, setQuizAnswers] = useState<number[]>([]);
   const [quizSubmitted, setQuizSubmitted] = useState(false);
-  const [score, setScore] = useState(0);
+  const [quizScore, setQuizScore] = useState(0);
 
-  const enrollment = enrollments.find((e: any) => e.course._id === courseId);
-
-  const lessons = enrollment?.course?.lessons || [];
+  const enrollment = enrollments.find(e => (typeof e.course === 'object' ? e.course._id : e.course) === courseId);
 
   useEffect(() => {
-    if (lesson) {
-      fetchQuiz();
+    if (user && courseId) {
+      dispatch(fetchEnrolledCourses());
+      fetchCourseData();
     }
-  }, [currentLesson]);
+  }, [dispatch, user, courseId]);
 
-  const fetchQuiz = async () => {
+  const fetchCourseData = async () => {
     try {
-      const response = await api.get(`/quizzes/lesson/${lesson._id}`);
-      if (response.data.length > 0) {
-        setQuiz(response.data[0]);
-        setAnswers(new Array(response.data[0].questions.length).fill(-1));
+      const [lessonsRes, assignmentsRes, quizzesRes] = await Promise.all([
+        fetch(`/api/lessons/course/${courseId}`),
+        fetch(`/api/assignments/course/${courseId}`),
+        fetch(`/api/quizzes/course/${courseId}`)
+      ]);
+
+      if (lessonsRes.ok) {
+        const lessonsData = await lessonsRes.json();
+        setLessons(lessonsData);
+        if (lessonsData.length > 0) {
+          setSelectedLesson(lessonsData[0]);
+        }
+      }
+
+      if (assignmentsRes.ok) {
+        setAssignments(await assignmentsRes.json());
+      }
+
+      if (quizzesRes.ok) {
+        setQuizzes(await quizzesRes.json());
       }
     } catch (error) {
-      console.error('Error fetching quiz:', error);
+      console.error('Error fetching course data:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleComplete = () => {
-    if (enrollment && lessons[currentLesson]) {
-      dispatch(updateProgress({ enrollmentId: enrollment._id, lessonId: lessons[currentLesson]._id }));
-      if (currentLesson < lessons.length - 1) {
-        setCurrentLesson(currentLesson + 1);
-      }
-    }
-  };
+  const handleLessonComplete = async (lessonId: string) => {
+    if (!enrollment) return;
 
-  const handleQuizSubmit = async () => {
-    if (!quiz) return;
     try {
-      const response = await api.post('/quizzes/submit', { quizId: quiz._id, answers });
-      setScore(response.data.score);
-      setQuizSubmitted(true);
+      await dispatch(updateProgress({ enrollmentId: enrollment._id, lessonId }));
+      dispatch(fetchEnrolledCourses()); // Refresh enrollments
+    } catch (error) {
+      console.error('Error updating progress:', error);
+    }
+  };
+
+  const handleQuizSubmit = async (quizId: string) => {
+    try {
+      const response = await fetch('/api/quizzes/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ quizId, answers: quizAnswers }),
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setQuizScore(data.score);
+        setQuizSubmitted(true);
+      }
     } catch (error) {
       console.error('Error submitting quiz:', error);
     }
   };
 
-  if (!enrollment) return <p>Enrollment not found</p>;
+  const isLessonCompleted = (lessonId: string) => {
+    return enrollment?.completedLessons.some(cl => cl.lesson === lessonId) || false;
+  };
 
-  const lesson = lessons[currentLesson];
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-2">Access Denied</h1>
+          <p className="text-muted-foreground">Please login to access lessons.</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!enrollment) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-2">Not Enrolled</h1>
+          <p className="text-muted-foreground">You are not enrolled in this course.</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <div className="container mx-auto px-4 py-8">
+          <div className="animate-pulse">
+            <div className="h-8 bg-muted rounded mb-8"></div>
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+              <div className="lg:col-span-1 h-96 bg-muted rounded"></div>
+              <div className="lg:col-span-3 h-96 bg-muted rounded"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">Lesson Player</h1>
-      {lesson ? (
-        <div>
-          <h2 className="text-2xl font-semibold mb-4">{lesson.title}</h2>
-          <div className="mb-4">
-            {/* @ts-ignore */}
-            <ReactPlayer url={lesson.videoUrl as string} controls width="100%" height="400px" />
-          </div>
-          <button onClick={handleComplete} className="bg-green-500 text-white px-4 py-2 rounded">
-            Mark as Completed
-          </button>
-          {quiz && !quizSubmitted && (
-            <div className="mt-8">
-              <h3 className="text-xl font-semibold mb-4">{quiz.title}</h3>
-              {quiz.questions.map((q, i) => (
-                <div key={i} className="mb-4">
-                  <p className="font-medium">{q.question}</p>
-                  {q.options.map((opt, j) => (
-                    <label key={j} className="block">
-                      <input
-                        type="radio"
-                        name={`q${i}`}
-                        value={j}
-                        checked={answers[i] === j}
-                        onChange={() => {
-                          const newAnswers = [...answers];
-                          newAnswers[i] = j;
-                          setAnswers(newAnswers);
-                        }}
-                      />
-                      {opt}
-                    </label>
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto px-4 py-8">
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold mb-2">{typeof enrollment.course === 'object' ? enrollment.course.title : 'Course'}</h1>
+          <p className="text-muted-foreground">Continue your learning journey</p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          {/* Lesson List Sidebar */}
+          <div className="lg:col-span-1">
+            <Card>
+              <CardHeader>
+                <CardTitle>Course Content</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  {lessons.map((lesson, index) => (
+                    <button
+                      key={lesson._id}
+                      onClick={() => {
+                        setSelectedLesson(lesson);
+                        setQuizSubmitted(false);
+                        setQuizAnswers([]);
+                      }}
+                      className={`w-full text-left p-3 rounded-lg transition-colors ${
+                        selectedLesson?._id === lesson._id
+                          ? 'bg-primary text-primary-foreground'
+                          : 'hover:bg-muted'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="shrink-0">
+                          {isLessonCompleted(lesson._id) ? (
+                            <CheckCircle className="h-5 w-5 text-green-600" />
+                          ) : (
+                            <Play className="h-5 w-5 text-muted-foreground" />
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium truncate">
+                            {index + 1}. {lesson.title}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {lesson.duration} min
+                          </p>
+                        </div>
+                      </div>
+                    </button>
                   ))}
                 </div>
-              ))}
-              <button onClick={handleQuizSubmit} className="bg-blue-500 text-white px-4 py-2 rounded">
-                Submit Quiz
-              </button>
-            </div>
-          )}
-          {quizSubmitted && (
-            <div className="mt-8">
-              <h3 className="text-xl font-semibold">Quiz Results</h3>
-              <p>Score: {score} / {quiz?.questions.length}</p>
-            </div>
-          )}
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Lesson Content */}
+          <div className="lg:col-span-3">
+            {selectedLesson ? (
+              <div className="space-y-6">
+                {/* Video Player */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>{selectedLesson.title}</CardTitle>
+                    <CardDescription>{selectedLesson.description}</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="aspect-video bg-black rounded-lg mb-4 overflow-hidden">
+                      {selectedLesson.videoUrl.includes('youtube') || selectedLesson.videoUrl.includes('youtu.be') ? (
+                        <iframe
+                          src={`https://www.youtube.com/embed/${getYouTubeId(selectedLesson.videoUrl)}`}
+                          className="w-full h-full"
+                          allowFullScreen
+                        />
+                      ) : (
+                        <video
+                          src={selectedLesson.videoUrl}
+                          controls
+                          className="w-full h-full"
+                        />
+                      )}
+                    </div>
+
+                    {!isLessonCompleted(selectedLesson._id) && (
+                      <Button
+                        onClick={() => handleLessonComplete(selectedLesson._id)}
+                        className="w-full"
+                      >
+                        <CheckCircle className="h-4 w-4 mr-2" />
+                        Mark as Completed
+                      </Button>
+                    )}
+                  </CardContent>
+                </Card>
+
+                {/* Assignments */}
+                {assignments
+                  .filter(assignment => selectedLesson.assignments.includes(assignment._id))
+                  .map(assignment => (
+                    <Card key={assignment._id}>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <FileText className="h-5 w-5" />
+                          Assignment: {assignment.title}
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="mb-4">{assignment.description}</p>
+                        {assignment.dueDate && (
+                          <p className="text-sm text-muted-foreground mb-4">
+                            Due: {new Date(assignment.dueDate).toLocaleDateString()}
+                          </p>
+                        )}
+                        <Button variant="outline">Submit Assignment</Button>
+                      </CardContent>
+                    </Card>
+                  ))}
+
+                {/* Quizzes */}
+                {quizzes
+                  .filter(quiz => selectedLesson.quizzes.includes(quiz._id))
+                  .map(quiz => (
+                    <Card key={quiz._id}>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <HelpCircle className="h-5 w-5" />
+                          Quiz: {quiz.title}
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        {!quizSubmitted ? (
+                          <div className="space-y-6">
+                            {quiz.questions.map((question, qIndex) => (
+                              <div key={qIndex}>
+                                <p className="font-medium mb-3">{question.question}</p>
+                                <div className="space-y-2">
+                                  {question.options.map((option, oIndex) => (
+                                    <label key={oIndex} className="flex items-center space-x-2 cursor-pointer">
+                                      <input
+                                        type="radio"
+                                        name={`question-${qIndex}`}
+                                        value={oIndex}
+                                        checked={quizAnswers[qIndex] === oIndex}
+                                        onChange={() => {
+                                          const newAnswers = [...quizAnswers];
+                                          newAnswers[qIndex] = oIndex;
+                                          setQuizAnswers(newAnswers);
+                                        }}
+                                        className="text-primary"
+                                      />
+                                      <span>{option}</span>
+                                    </label>
+                                  ))}
+                                </div>
+                              </div>
+                            ))}
+                            <Button
+                              onClick={() => handleQuizSubmit(quiz._id)}
+                              disabled={quizAnswers.length !== quiz.questions.length || quizAnswers.includes(-1)}
+                            >
+                              Submit Quiz
+                            </Button>
+                          </div>
+                        ) : (
+                          <div className="text-center">
+                            <h3 className="text-lg font-semibold mb-2">Quiz Results</h3>
+                            <p className="text-2xl font-bold text-primary mb-2">
+                              {quizScore} / {quiz.questions.length}
+                            </p>
+                            <p className="text-muted-foreground">
+                              {quizScore === quiz.questions.length ? 'Perfect! 🎉' : 'Keep practicing!'}
+                            </p>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  ))}
+              </div>
+            ) : (
+              <Card>
+                <CardContent className="p-8 text-center">
+                  <Play className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">Select a Lesson</h3>
+                  <p className="text-muted-foreground">Choose a lesson from the sidebar to start learning.</p>
+                </CardContent>
+              </Card>
+            )}
+          </div>
         </div>
-      ) : (
-        <p>No lessons available</p>
-      )}
+      </div>
     </div>
   );
 }

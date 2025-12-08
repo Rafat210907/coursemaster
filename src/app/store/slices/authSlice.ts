@@ -1,12 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import api from '@/lib/axios';
-
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-}
+import { User } from '@/types';
+import toast from 'react-hot-toast';
 
 interface AuthState {
   user: User | null;
@@ -43,6 +38,14 @@ export const getProfile = createAsyncThunk('auth/profile', async () => {
   return response.data;
 });
 
+export const updateProfile = createAsyncThunk(
+  'auth/updateProfile',
+  async (profileData: { name?: string; email?: string; currentPassword?: string; newPassword?: string }) => {
+    const response = await api.put('/auth/profile', profileData);
+    return response.data;
+  }
+);
+
 const authSlice = createSlice({
   name: 'auth',
   initialState,
@@ -51,6 +54,7 @@ const authSlice = createSlice({
       state.user = null;
       state.token = null;
       localStorage.removeItem('token');
+      toast.success('Logged out successfully');
     },
     setToken: (state, action) => {
       state.token = action.payload;
@@ -69,10 +73,12 @@ const authSlice = createSlice({
         state.user = action.payload.user;
         state.token = action.payload.token;
         localStorage.setItem('token', action.payload.token);
+        toast.success('Account created successfully!');
       })
       .addCase(register.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || 'Registration failed';
+        toast.error(state.error);
       })
       .addCase(login.pending, (state) => {
         state.loading = true;
@@ -82,13 +88,19 @@ const authSlice = createSlice({
         state.user = action.payload.user;
         state.token = action.payload.token;
         localStorage.setItem('token', action.payload.token);
+        toast.success('Logged in successfully!');
       })
       .addCase(login.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || 'Login failed';
+        toast.error(state.error);
       })
       .addCase(getProfile.fulfilled, (state, action) => {
         state.user = action.payload;
+      })
+      .addCase(updateProfile.fulfilled, (state, action) => {
+        state.user = action.payload;
+        toast.success('Profile updated successfully!');
       });
   },
 });
