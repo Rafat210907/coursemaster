@@ -21,12 +21,15 @@ export default function Header() {
           {user ? (
             <>
               <Link href="/dashboard">Dashboard</Link>
+              <button className="relative">🔔 <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1">3</span></button>
               {user.role === 'admin' && (
                 <>
                   <Link href="/admin/courses">Admin Courses</Link>
                   <Link href="/admin/analytics">Analytics</Link>
+                  <Link href="/admin/quiz">Create Quiz</Link>
                 </>
               )}
+              <Link href="/profile">Profile</Link>
               <button onClick={handleLogout}>Logout</button>
             </>
           ) : (

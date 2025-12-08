@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import useSWR from 'swr';
 import api from '../../../lib/axios';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart, Pie, Cell } from 'recharts';
 
@@ -11,23 +12,15 @@ interface Analytics {
   monthlyEnrollments: { _id: number; count: number }[];
   coursePopularity: { title: string; count: number }[];
   topQuizCompleters: { name: string; totalScore: number }[];
+  topSearchedCourses: { title: string; searchCount: number }[];
 }
 
+const fetcher = (url: string) => api.get(url).then(res => res.data);
+
 export default function Analytics() {
-  const [analytics, setAnalytics] = useState<Analytics | null>(null);
+  const { data: analytics, error } = useSWR<Analytics>('/analytics', fetcher);
 
-  useEffect(() => {
-    const fetchAnalytics = async () => {
-      try {
-        const response = await api.get('/analytics');
-        setAnalytics(response.data);
-      } catch (error) {
-        console.error('Error fetching analytics:', error);
-      }
-    };
-    fetchAnalytics();
-  }, []);
-
+  if (error) return <p>Error loading analytics</p>;
   if (!analytics) return <p>Loading...</p>;
 
   return (
@@ -69,14 +62,14 @@ export default function Analytics() {
         </div>
       </div>
       <div className="mt-8">
-        <h2 className="text-2xl font-semibold mb-4">Top Quiz Completers</h2>
+        <h2 className="text-2xl font-semibold mb-4">Top Searched Courses</h2>
         <div className="bg-white p-6 rounded-lg shadow">
-          <BarChart width={600} height={300} data={analytics.topQuizCompleters}>
+          <BarChart width={600} height={300} data={analytics.topSearchedCourses}>
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" />
+            <XAxis dataKey="title" />
             <YAxis />
             <Tooltip />
-            <Bar dataKey="totalScore" fill="#82ca9d" />
+            <Bar dataKey="searchCount" fill="#ff7300" />
           </BarChart>
         </div>
       </div>
