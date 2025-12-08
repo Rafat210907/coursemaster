@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchCourses } from './store/slices/courseSlice';
 import Link from 'next/link';
+import Skeleton from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
 
 interface Course {
   _id: string;
@@ -50,10 +52,25 @@ export default function Home() {
           <option value="programming">Programming</option>
           <option value="design">Design</option>
           <option value="business">Business</option>
+          <option value="marketing">Marketing</option>
+          <option value="data-science">Data Science</option>
+          <option value="photography">Photography</option>
         </select>
       </div>
 
-      {loading && <p>Loading...</p>}
+      {loading && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="border rounded-lg p-4 shadow">
+              <Skeleton height={24} className="mb-2" />
+              <Skeleton count={2} className="mb-2" />
+              <Skeleton height={16} className="mb-2" />
+              <Skeleton height={20} className="mb-4" />
+              <Skeleton height={36} width={100} />
+            </div>
+          ))}
+        </div>
+      )}
       {error && <p className="text-red-500">{error}</p>}
       {!loading && !error && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
