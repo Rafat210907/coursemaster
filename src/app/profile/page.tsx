@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import api from '../../lib/axios';
+import MD5 from 'crypto-js/md5';
+import Image from 'next/image';
 
 interface User {
   _id: string;
@@ -13,12 +15,10 @@ interface User {
 
 export default function Profile() {
   const { user } = useSelector((state: any) => state.auth);
-  const [profile, setProfile] = useState<User | null>(null);
+  const [profile, setProfile] = useState<User | null>(user);
 
   useEffect(() => {
-    if (user) {
-      setProfile(user);
-    }
+    setProfile(user);
   }, [user]);
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -35,6 +35,8 @@ export default function Profile() {
     }
   };
 
+  const gravatarUrl = profile ? `https://www.gravatar.com/avatar/${MD5(profile.email.toLowerCase()).toString()}?d=identicon` : '';
+
   if (!profile) return <p>Please login</p>;
 
   return (
@@ -42,7 +44,7 @@ export default function Profile() {
       <h1 className="text-3xl font-bold mb-8">My Profile</h1>
       <div className="bg-white p-6 rounded-lg shadow">
         <div className="mb-4">
-          <img src={profile.avatar || `https://www.gravatar.com/avatar/${profile.email}?d=identicon`} alt="Avatar" className="w-24 h-24 rounded-full" />
+          <Image src={profile.avatar || gravatarUrl} alt="Avatar" width={96} height={96} className="rounded-full" />
           <input type="file" onChange={handleAvatarUpload} className="mt-2" />
         </div>
         <p><strong>Name:</strong> {profile.name}</p>
