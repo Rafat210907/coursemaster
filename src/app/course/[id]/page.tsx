@@ -9,8 +9,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui
 import { Button } from '../../../components/ui/Button';
 import { RootState, AppDispatch } from '../../store/store';
 import { Course, Review } from '../../../types';
-import { Star, Clock, Users, BookOpen, CheckCircle, MessageSquare } from 'lucide-react';
+import { Star, Clock, Users, BookOpen, CheckCircle, MessageSquare, Award, User } from 'lucide-react';
 import api from '../../../lib/axios';
+import Image from 'next/image';
+import TutorCard from '../../../components/TutorCard';
 
 export default function CourseDetails() {
   const { id } = useParams();
@@ -283,14 +285,24 @@ export default function CourseDetails() {
 
                 <div className="mt-6 space-y-3">
                   <div className="flex items-center gap-2 text-sm">
-                    <Users className="h-4 w-4 text-muted-foreground" />
-                    <span>Instructor: {course.instructor}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm">
                     <Clock className="h-4 w-4 text-muted-foreground" />
                     <span>Self-paced learning</span>
                   </div>
                 </div>
+
+                {/* Tutor Card: placed below the Enroll Now card */}
+                {typeof course.instructor === 'object' && (
+                  <div className="mt-6">
+                    <TutorCard
+                      name={course.instructor.name}
+                      expertise={course.instructor.expertise}
+                      rating={course.instructor.rating}
+                      profileImage={course.instructor.profileImage}
+                      activeCourseCount={Array.isArray(course.instructor.courses) ? course.instructor.courses.length : undefined}
+                      onGiveRating={() => setShowReviewForm(true)}
+                    />
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>

@@ -8,6 +8,20 @@ export interface User {
   createdAt: string;
 }
 
+export interface Tutor {
+  _id: string;
+  name: string;
+  bio?: string;
+  expertise: string[];
+  experience: number;
+  profileImage?: string;
+  rating: number;
+  totalStudents: number;
+  isActive: boolean;
+  courses: string[];
+  createdAt: string;
+}
+
 export interface Course {
   _id: string;
   title: string;
@@ -17,7 +31,7 @@ export interface Course {
   duration: number;
   tags: string[];
   category: string;
-  instructor: string;
+  instructor: string | Tutor;
   lessons: string[];
   batches: string[];
   createdAt: string;

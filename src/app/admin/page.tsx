@@ -35,6 +35,7 @@ export default function AdminDashboard() {
   const sidebarItems = [
     { id: 'analytics', label: 'Analytics', icon: BarChart3, active: true },
     { id: 'courses', label: 'Admin Courses', icon: BookOpen, href: '/admin/courses' },
+    { id: 'tutors', label: 'Manage Tutors', icon: Users, href: '/admin/tutors' },
     { id: 'quiz', label: 'Create Quiz', icon: Plus, href: '/admin/quiz' },
   ];
 

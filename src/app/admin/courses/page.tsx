@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchAllCourses, createCourse, updateCourse, deleteCourse } from '../../store/slices/adminSlice';
+import { fetchTutors } from '../../store/slices/tutorSlice';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../components/ui/Card';
 import { Button } from '../../../components/ui/Button';
 import { Input } from '../../../components/ui/Input';
@@ -14,6 +15,7 @@ import toast from 'react-hot-toast';
 export default function AdminCourses() {
   const dispatch = useDispatch<AppDispatch>();
   const { courses, loading, error } = useSelector((state: RootState) => state.admin);
+  const { tutors } = useSelector((state: RootState) => state.tutors);
   const { user } = useSelector((state: RootState) => state.auth);
   const [showForm, setShowForm] = useState(false);
   const [editingCourse, setEditingCourse] = useState<Course | null>(null);
@@ -31,6 +33,7 @@ export default function AdminCourses() {
   useEffect(() => {
     if (user?.role === 'admin') {
       dispatch(fetchAllCourses());
+      dispatch(fetchTutors({ activeOnly: 'true' }));
     }
   }, [dispatch, user]);
 
@@ -66,7 +69,7 @@ export default function AdminCourses() {
       toast.error('Category is required');
       return;
     }
-    if (!formData.instructor.trim()) {
+    if (!formData.instructor) {
       toast.error('Instructor is required');
       return;
     }
@@ -77,7 +80,7 @@ export default function AdminCourses() {
       price: formData.price,
       duration: formData.duration,
       category: formData.category.trim(),
-      instructor: formData.instructor.trim(),
+      instructor: formData.instructor,
       tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0),
       syllabus: formData.syllabus.filter(item => item.title.trim().length > 0 && item.content.trim().length > 0),
     };
@@ -114,7 +117,7 @@ export default function AdminCourses() {
       price: course.price,
       duration: course.duration,
       category: course.category,
-      instructor: course.instructor,
+      instructor: typeof course.instructor === 'object' ? course.instructor._id : course.instructor,
       tags: course.tags.join(', '),
       syllabus: course.syllabus.length > 0 ? course.syllabus : [{ title: '', content: '' }],
     });
@@ -246,11 +249,19 @@ export default function AdminCourses() {
                     </div>
                     <div>
                       <label className="block text-sm font-medium mb-2">Instructor</label>
-                      <Input
+                      <select
                         value={formData.instructor}
                         onChange={(e) => setFormData({ ...formData, instructor: e.target.value })}
+                        className="w-full p-2 border rounded-md"
                         required
-                      />
+                      >
+                        <option value="">Select an instructor</option>
+                        {tutors.map((tutor) => (
+                          <option key={tutor._id} value={tutor._id}>
+                            {tutor.name} - {tutor.expertise.join(', ')}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                   </div>
 
@@ -385,7 +396,7 @@ export default function AdminCourses() {
                     <div className="space-y-3">
                       <div className="flex items-center gap-2 text-sm">
                         <Users className="h-4 w-4 text-muted-foreground" />
-                        <span>Instructor: {formData.instructor || 'Instructor Name'}</span>
+                        <span>Instructor: {formData.instructor ? tutors.find(t => t._id === formData.instructor)?.name || 'Unknown Instructor' : 'Instructor Name'}</span>
                       </div>
                       <div className="flex items-center gap-2 text-sm">
                         <Clock className="h-4 w-4 text-muted-foreground" />
@@ -425,7 +436,7 @@ export default function AdminCourses() {
                   <div className="space-y-3">
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <BookOpen className="h-4 w-4" />
-                      <span>{course.instructor}</span>
+                      <span>{typeof course.instructor === 'object' ? course.instructor.name : 'Unknown Instructor'}</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <Users className="h-4 w-4" />

@@ -114,7 +114,9 @@ export default function Home() {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-2">
-                      <p className="text-sm text-muted-foreground">Instructor: {course.instructor}</p>
+                      <p className="text-sm text-muted-foreground">
+                        Instructor: {typeof course.instructor === 'object' ? course.instructor.name : course.instructor}
+                      </p>
                       <p className="text-sm text-muted-foreground">Duration: {course.duration} hours</p>
                       <div className="flex flex-wrap gap-1">
                         {course.tags.slice(0, 3).map((tag) => (

@@ -127,7 +127,15 @@ export default function Dashboard() {
                 <Card key={enrollment._id} className="hover:shadow-lg transition-shadow">
                   <CardHeader>
                     <CardTitle className="line-clamp-2">{(enrollment.course as Course)?.title || 'Unknown Course'}</CardTitle>
-                    <CardDescription>{(enrollment.course as Course)?.instructor || 'Unknown Instructor'}</CardDescription>
+                    <CardDescription>
+                      {(() => {
+                        const instructor = (enrollment.course as Course)?.instructor;
+                        if (typeof instructor === 'object' && instructor !== null) {
+                          return instructor.name;
+                        }
+                        return instructor || 'Unknown Instructor';
+                      })()}
+                    </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
