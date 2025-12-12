@@ -40,7 +40,7 @@ export const getProfile = createAsyncThunk('auth/profile', async () => {
 
 export const updateProfile = createAsyncThunk(
   'auth/updateProfile',
-  async (profileData: { name?: string; email?: string; currentPassword?: string; newPassword?: string }) => {
+  async (profileData: { name?: string; email?: string; currentPassword?: string; newPassword?: string; profileImage?: string }) => {
     const response = await api.put('/auth/profile', profileData);
     return response.data;
   }

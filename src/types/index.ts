@@ -1,10 +1,11 @@
 export interface User {
   _id: string;
+  userId?: string;
   name: string;
   email: string;
   role: 'student' | 'admin';
   enrolledCourses: string[];
-  avatar?: string;
+  profileImage?: string;
   createdAt: string;
 }
 
@@ -15,7 +16,6 @@ export interface Tutor {
   expertise: string[];
   experience: number;
   profileImage?: string;
-  rating: number;
   totalStudents: number;
   isActive: boolean;
   courses: string[];

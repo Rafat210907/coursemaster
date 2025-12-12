@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../..
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { RootState, AppDispatch } from '../store/store';
-import { Camera, User as UserIcon, Calendar, Shield } from 'lucide-react';
+import { User as UserIcon, Calendar, Shield } from 'lucide-react';
 import Image from 'next/image';
 
 export default function Profile() {
@@ -20,6 +20,7 @@ export default function Profile() {
     currentPassword: '',
     newPassword: '',
     confirmPassword: '',
+    profileImage: '',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -32,6 +33,7 @@ export default function Profile() {
         currentPassword: '',
         newPassword: '',
         confirmPassword: '',
+        profileImage: user.profileImage || '',
       });
     }
   }, [user]);
@@ -78,9 +80,10 @@ export default function Profile() {
     if (!validateForm()) return;
 
     try {
-      const updateData: { name?: string; email?: string; currentPassword?: string; newPassword?: string } = {
+      const updateData: { name?: string; email?: string; currentPassword?: string; newPassword?: string; profileImage?: string } = {
         name: formData.name,
         email: formData.email,
+        profileImage: formData.profileImage,
       };
 
       if (formData.newPassword) {
@@ -102,23 +105,6 @@ export default function Profile() {
         setErrors({ general: err.response.data.message });
       } else {
         setErrors({ general: 'Failed to update profile' });
-      }
-    }
-  };
-
-  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const formData = new FormData();
-      formData.append('avatar', file);
-
-      try {
-        // This would need to be implemented in the backend
-        // const response = await api.post('/upload/avatar', formData);
-        // dispatch(updateProfile({ avatar: response.data.avatarUrl }));
-        alert('Avatar upload functionality would be implemented here');
-      } catch (error) {
-        console.error('Upload failed:', error);
       }
     }
   };
@@ -157,23 +143,12 @@ export default function Profile() {
                   <div className="text-center">
                     <div className="relative w-24 h-24 mx-auto mb-4">
                       <Image
-                        src={user.avatar || gravatarUrl}
+                        src={user.profileImage || gravatarUrl}
                         alt="Profile"
                         width={96}
                         height={96}
                         className="w-full h-full rounded-full object-cover"
                       />
-                      {isEditing && (
-                        <label className="absolute bottom-0 right-0 bg-primary text-primary-foreground rounded-full p-1 cursor-pointer hover:bg-primary/90 transition-colors">
-                          <Camera className="h-4 w-4" />
-                          <input
-                            type="file"
-                            accept="image/*"
-                            onChange={handleAvatarUpload}
-                            className="hidden"
-                          />
-                        </label>
-                      )}
                     </div>
                     <h2 className="text-xl font-semibold mb-1">{user.name}</h2>
                     <p className="text-muted-foreground mb-4">{user.email}</p>
@@ -205,6 +180,13 @@ export default function Profile() {
                     <div>
                       <p className="text-sm font-medium">Account type</p>
                       <p className="text-sm text-muted-foreground capitalize">{user.role}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <UserIcon className="h-4 w-4 text-muted-foreground" />
+                    <div>
+                      <p className="text-sm font-medium">User ID</p>
+                      <p className="text-sm text-muted-foreground font-mono">{user.userId || 'Not assigned'}</p>
                     </div>
                   </div>
                 </CardContent>
@@ -255,6 +237,20 @@ export default function Profile() {
                           <p className="text-destructive text-sm mt-1">{errors.email}</p>
                         )}
                       </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Profile Image URL</label>
+                      <Input
+                        type="url"
+                        value={formData.profileImage}
+                        onChange={(e) => handleInputChange('profileImage', e.target.value)}
+                        disabled={!isEditing}
+                        placeholder="https://example.com/your-image.jpg"
+                      />
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Enter a URL for your profile image. Leave empty to use default avatar.
+                      </p>
                     </div>
 
                     {isEditing && (
@@ -324,6 +320,7 @@ export default function Profile() {
                                 currentPassword: '',
                                 newPassword: '',
                                 confirmPassword: '',
+                                profileImage: user.profileImage || '',
                               });
                             }}
                           >

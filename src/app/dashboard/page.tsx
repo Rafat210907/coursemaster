@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../..
 import { Button } from '../../components/ui/Button';
 import { RootState, AppDispatch } from '../store/store';
 import { Enrollment, Course } from '../../types';
-import { BookOpen, TrendingUp, Clock, Award } from 'lucide-react';
+import { BookOpen, TrendingUp, Clock, Award, HelpCircle } from 'lucide-react';
 
 export default function Dashboard() {
   const dispatch = useDispatch<AppDispatch>();
@@ -61,7 +61,27 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8">
+      <div className="flex">
+        {/* Left Sidebar */}
+        <div className="w-64 bg-card border-r min-h-screen">
+          <div className="p-6">
+            <h2 className="text-lg font-semibold mb-6">Dashboard</h2>
+            <nav className="space-y-2">
+              <Link href="/dashboard" className="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary text-primary-foreground">
+                <BookOpen className="h-5 w-5" />
+                My Courses
+              </Link>
+              <Link href="/dashboard/quizzes" className="flex items-center gap-3 px-3 py-2 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground">
+                <HelpCircle className="h-5 w-5" />
+                Quizzes
+              </Link>
+            </nav>
+          </div>
+        </div>
+
+        {/* Main Content */}
+        <div className="flex-1">
+          <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Welcome back, {user.name}!</h1>
           <p className="text-muted-foreground">Continue your learning journey</p>
@@ -181,6 +201,8 @@ export default function Dashboard() {
             </Card>
           )}
         </div>
+      </div>
+      </div>
       </div>
     </div>
   );

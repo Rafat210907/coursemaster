@@ -9,9 +9,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui
 import { Button } from '../../../components/ui/Button';
 import { RootState, AppDispatch } from '../../store/store';
 import { Course, Review } from '../../../types';
-import { Star, Clock, Users, BookOpen, CheckCircle, MessageSquare, Award, User } from 'lucide-react';
+import { Star, Clock, BookOpen, CheckCircle, MessageSquare } from 'lucide-react';
 import api from '../../../lib/axios';
-import Image from 'next/image';
 import TutorCard from '../../../components/TutorCard';
 
 export default function CourseDetails() {
@@ -254,7 +253,8 @@ export default function CourseDetails() {
           </div>
 
           {/* Sidebar */}
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-1 space-y-4">
+            {/* Enroll card */}
             <Card className="sticky top-4">
               <CardContent className="p-6">
                 <div className="text-center mb-6">
@@ -289,22 +289,18 @@ export default function CourseDetails() {
                     <span>Self-paced learning</span>
                   </div>
                 </div>
-
-                {/* Tutor Card: placed below the Enroll Now card */}
-                {typeof course.instructor === 'object' && (
-                  <div className="mt-6">
-                    <TutorCard
-                      name={course.instructor.name}
-                      expertise={course.instructor.expertise}
-                      rating={course.instructor.rating}
-                      profileImage={course.instructor.profileImage}
-                      activeCourseCount={Array.isArray(course.instructor.courses) ? course.instructor.courses.length : undefined}
-                      onGiveRating={() => setShowReviewForm(true)}
-                    />
-                  </div>
-                )}
               </CardContent>
             </Card>
+
+            {/* Instructor card (no rating actions) */}
+            {typeof course.instructor === 'object' && (
+              <TutorCard
+                name={course.instructor.name}
+                expertise={course.instructor.expertise}
+                profileImage={course.instructor.profileImage}
+                activeCourseCount={Array.isArray(course.instructor.courses) ? course.instructor.courses.length : undefined}
+              />
+            )}
           </div>
         </div>
       </div>

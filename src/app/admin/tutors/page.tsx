@@ -9,9 +9,8 @@ import { Input } from '../../../components/ui/Input';
 import { RootState, AppDispatch } from '../../store/store';
 import { Tutor } from '../../../types';
 import Image from 'next/image';
-import { Plus, Edit, Trash2, User, Star, Users, Award } from 'lucide-react';
+import { Plus, Edit, Trash2, User, Users, Award } from 'lucide-react';
 import toast from 'react-hot-toast';
-import api from '../../../lib/axios';
 
 export default function AdminTutors() {
   const dispatch = useDispatch<AppDispatch>();
@@ -96,40 +95,6 @@ export default function AdminTutors() {
     }
   };
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
-      toast.error('Please select an image file');
-      return;
-    }
-
-    // Validate file size (5MB limit)
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error('File size must be less than 5MB');
-      return;
-    }
-
-    const formDataUpload = new FormData();
-    formDataUpload.append('profileImage', file);
-
-    try {
-      const response = await api.post('/tutors/upload-profile-image', formDataUpload, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-
-      setFormData({ ...formData, profileImage: response.data.profileImageUrl });
-      toast.success('Image uploaded successfully');
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to upload image';
-      toast.error(errorMessage);
-    }
-  };
-
   const resetForm = () => {
     setFormData({
       name: '',
@@ -137,9 +102,7 @@ export default function AdminTutors() {
       expertise: '',
       experience: 0,
       profileImage: '',
-      rating: 0,
       totalStudents: 0,
-      isActive: true,
     });
   };
 
@@ -154,7 +117,7 @@ export default function AdminTutors() {
   }
 
   return (
-    <div className="p-6">
+    <div className="min-h-screen bg-background p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Tutor Management</h1>
         <Button onClick={() => setShowForm(true)} className="flex items-center gap-2">
@@ -217,22 +180,32 @@ export default function AdminTutors() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-1">Profile Image</label>
-                  <div className="w-full">
-                    <Input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => handleImageUpload(e)}
-                      className="w-full file:mr-3 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
-                    />
+              <div>
+                <label className="block text-sm font-medium mb-1">Profile Image URL</label>
+                <Input
+                  type="url"
+                  value={formData.profileImage}
+                  onChange={(e) => setFormData({ ...formData, profileImage: e.target.value })}
+                  placeholder="https://example.com/image.jpg"
+                />
+                {formData.profileImage && (
+                  <div className="mt-3 flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                    <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-gray-200 shrink-0">
+                      <Image
+                        src={formData.profileImage}
+                        alt="Profile preview"
+                        width={80}
+                        height={80}
+                        className="w-full h-full object-cover"
+                        unoptimized
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-gray-900">Profile image preview</p>
+                      <p className="text-xs text-gray-500">This image will be used for the tutor&apos;s profile</p>
+                    </div>
                   </div>
-                  {formData.profileImage && (
-                    <p className="text-sm text-gray-600 mt-1">Current image will be replaced</p>
-                  )}
-                </div>
-                {/* Rating removed: user-driven via reviews */}
+                )}
               </div>
               {/* Active/Inactive toggle removed: automated based on courses */}
 
@@ -248,106 +221,105 @@ export default function AdminTutors() {
           </CardContent>
         </Card>
       )}
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {tutors.map((tutor) => (
-          <Card key={tutor._id} className="hover:shadow-lg transition-shadow">
-            <CardHeader className="pb-3">
-              <div className="flex items-start justify-between">
-                <div className="flex items-center gap-3">
-                  {tutor.profileImage ? (
-                    <Image
-                      src={tutor.profileImage}
-                      alt={tutor.name}
-                      width={48}
-                      height={48}
-                      className="w-12 h-12 rounded-full object-cover"
-                      unoptimized
-                    />
-                  ) : (
-                    <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
-                      <User size={24} className="text-gray-500" />
+      {!showForm && (
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {tutors.map((tutor) => (
+              <Card key={tutor._id} className="hover:shadow-lg transition-shadow">
+                <CardHeader className="pb-3">
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-3">
+                      {tutor.profileImage ? (
+                        <Image
+                          src={tutor.profileImage}
+                          alt={tutor.name}
+                          width={48}
+                          height={48}
+                          className="w-12 h-12 rounded-full object-cover"
+                          unoptimized
+                        />
+                      ) : (
+                        <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
+                          <User size={24} className="text-gray-500" />
+                        </div>
+                      )}
+                      <div>
+                        <CardTitle className="text-lg">{tutor.name}</CardTitle>
+                      </div>
                     </div>
-                  )}
-                  <div>
-                    <CardTitle className="text-lg">{tutor.name}</CardTitle>
-                  </div>
-                </div>
-                <div className="flex gap-1">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => handleEdit(tutor)}
-                    className="p-2"
-                  >
-                    <Edit size={16} />
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => handleDelete(tutor._id)}
-                    className="p-2 text-red-600 hover:text-red-700"
-                  >
-                    <Trash2 size={16} />
-                  </Button>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                {tutor.bio && (
-                  <p className="text-sm text-gray-600 line-clamp-2">{tutor.bio}</p>
-                )}
-
-                <div className="flex flex-wrap gap-1">
-                  {tutor.expertise.slice(0, 3).map((exp, index) => (
-                    <span
-                      key={index}
-                      className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full"
-                    >
-                      {exp}
-                    </span>
-                  ))}
-                  {tutor.expertise.length > 3 && (
-                    <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
-                      +{tutor.expertise.length - 3} more
-                    </span>
-                  )}
-                </div>
-
-                <div className="flex items-center justify-between text-sm">
-                  <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-1">
-                      <Star size={14} className="text-yellow-500" />
-                      <span>{tutor.rating.toFixed(1)}</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Users size={14} className="text-blue-500" />
-                      <span>{tutor.totalStudents}</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Award size={14} className="text-green-500" />
-                      <span>{tutor.experience}y</span>
+                    <div className="flex gap-1">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleEdit(tutor)}
+                        className="p-2"
+                      >
+                        <Edit size={16} />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleDelete(tutor._id)}
+                        className="p-2 text-red-600 hover:text-red-700"
+                      >
+                        <Trash2 size={16} />
+                      </Button>
                     </div>
                   </div>
-                  <div className={`px-2 py-1 rounded-full text-xs ${
-                    tutor.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                  }`}>
-                    {tutor.isActive ? 'Active' : 'Inactive'}
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    {tutor.bio && (
+                      <p className="text-sm text-gray-600 line-clamp-2">{tutor.bio}</p>
+                    )}
 
-      {tutors.length === 0 && !loading && (
-        <div className="text-center py-12">
-          <User size={48} className="mx-auto text-gray-400 mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No tutors found</h3>
-          <p className="text-gray-500">Get started by adding your first tutor.</p>
-        </div>
+                    <div className="flex flex-wrap gap-1">
+                      {tutor.expertise.slice(0, 3).map((exp, index) => (
+                        <span
+                          key={index}
+                          className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full"
+                        >
+                          {exp}
+                        </span>
+                      ))}
+                      {tutor.expertise.length > 3 && (
+                        <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
+                          +{tutor.expertise.length - 3} more
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="flex items-center justify-between text-sm">
+                      <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-1">
+                          <Users size={14} className="text-blue-500" />
+                          <span>{tutor.totalStudents}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Award size={14} className="text-green-500" />
+                          <span>{tutor.experience}y</span>
+                        </div>
+                      </div>
+                      <div className={`px-2 py-1 rounded-full text-xs ${
+                        tutor.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                      }`}>
+                        {tutor.isActive ? 'Active' : 'Inactive'}
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          {tutors.length === 0 && !loading && (
+            <div className="text-center py-12">
+              <User size={48} className="mx-auto text-gray-400 mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">No tutors found</h3>
+              <p className="text-gray-500">Get started by adding your first tutor.</p>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

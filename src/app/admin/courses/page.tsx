@@ -258,7 +258,7 @@ export default function AdminCourses() {
                         <option value="">Select an instructor</option>
                         {tutors.map((tutor) => (
                           <option key={tutor._id} value={tutor._id}>
-                            {tutor.name} - {tutor.expertise.join(', ')}
+                            {tutor.name} - {Array.isArray(tutor.expertise) ? tutor.expertise.join(', ') : tutor.expertise}
                           </option>
                         ))}
                       </select>
@@ -410,59 +410,61 @@ export default function AdminCourses() {
           </div>
         )}
 
-        {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <Card key={i}>
-                <CardContent className="p-6">
-                  <div className="animate-pulse">
-                    <div className="h-4 bg-muted rounded mb-2"></div>
-                    <div className="h-4 bg-muted rounded mb-4"></div>
-                    <div className="h-6 bg-muted rounded"></div>
+        {!showForm && (
+          loading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <Card key={i}>
+                  <CardContent className="p-6">
+                    <div className="animate-pulse">
+                      <div className="h-4 bg-muted rounded mb-2"></div>
+                      <div className="h-4 bg-muted rounded mb-4"></div>
+                      <div className="h-6 bg-muted rounded"></div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {courses.map((course) => (
+                <Card key={course._id} className="hover:shadow-lg transition-shadow">
+                  <CardHeader>
+                    <CardTitle className="line-clamp-2">{course.title}</CardTitle>
+                    <CardDescription>{course.category}</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <BookOpen className="h-4 w-4" />
+                        <span>{typeof course.instructor === 'object' ? course.instructor.name : 'Unknown Instructor'}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Users className="h-4 w-4" />
+                        <span>{course.lessons.length} lessons</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Clock className="h-4 w-4" />
+                        <span>{course.duration} hours</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-lg font-bold">
+                        <DollarSign className="h-4 w-4" />
+                        <span>{course.price}</span>
+                      </div>
+                    </div>
+                  </CardContent>
+                  <div className="p-6 pt-0 flex gap-2">
+                    <Button variant="outline" size="sm" onClick={() => handleEdit(course)}>
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button variant="destructive" size="sm" onClick={() => handleDelete(course._id)}>
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {courses.map((course) => (
-              <Card key={course._id} className="hover:shadow-lg transition-shadow">
-                <CardHeader>
-                  <CardTitle className="line-clamp-2">{course.title}</CardTitle>
-                  <CardDescription>{course.category}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <BookOpen className="h-4 w-4" />
-                      <span>{typeof course.instructor === 'object' ? course.instructor.name : 'Unknown Instructor'}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Users className="h-4 w-4" />
-                      <span>{course.lessons.length} lessons</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Clock className="h-4 w-4" />
-                      <span>{course.duration} hours</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-lg font-bold">
-                      <DollarSign className="h-4 w-4" />
-                      <span>{course.price}</span>
-                    </div>
-                  </div>
-                </CardContent>
-                <div className="p-6 pt-0 flex gap-2">
-                  <Button variant="outline" size="sm" onClick={() => handleEdit(course)}>
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                  <Button variant="destructive" size="sm" onClick={() => handleDelete(course._id)}>
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              </Card>
-            ))}
-          </div>
+                </Card>
+              ))}
+            </div>
+          )
         )}
       </div>
     </div>
