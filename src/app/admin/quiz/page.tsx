@@ -128,26 +128,31 @@ export default function QuizBuilder() {
     <div className="min-h-screen bg-background">
       <div className="flex">
         <AdminSidebar />
-        <div className="flex-1 p-8">
-          <div className="max-w-4xl mx-auto">
+        <div className="flex-1 p-4 md:p-8 overflow-x-hidden relative">
+          {/* Blurred Decorative Background Elements */}
+          <div className="absolute top-20 -left-20 w-72 h-72 bg-primary/10 rounded-full blur-[100px] -z-0 pointer-events-none" />
+          <div className="absolute bottom-40 -right-20 w-96 h-96 bg-blue-500/10 rounded-full blur-[120px] -z-0 pointer-events-none" />
+
+          <div className="max-w-4xl mx-auto relative z-10">
             <div className="flex items-center gap-3 mb-6">
               <HelpCircle className="h-8 w-8 text-primary" />
-              <h1 className="text-3xl font-bold">Quiz Builder</h1>
+              <h1 className="text-2xl md:text-3xl font-bold">Quiz Builder</h1>
             </div>
 
-            <Card className="shadow-lg border-none">
-              <CardHeader className="border-b bg-muted/30">
+            <Card className="shadow-premium border-none bg-card/30 backdrop-blur-2xl border border-white/5 overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent pointer-events-none" />
+              <CardHeader className="relative z-10 border-b border-white/10 bg-muted/30">
                 <CardTitle className="flex items-center gap-2 text-xl">
                   <BookOpen className="h-5 w-5" />
                   Create New Quiz
                 </CardTitle>
               </CardHeader>
-              <CardContent className="p-6">
+              <CardContent className="p-6 relative z-10">
                 <form onSubmit={handleSubmit} className="space-y-6">
                   {/* Quiz Basic Info */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                      <label className="text-sm font-medium text-foreground/80 flex items-center gap-2">
                         <BookOpen className="h-4 w-4" />
                         Quiz Title *
                       </label>
@@ -156,20 +161,20 @@ export default function QuizBuilder() {
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
                         placeholder="Enter quiz title"
-                        className="w-full"
+                        className="w-full bg-background/50 border-input"
                         required
                       />
                     </div>
 
                     <div className="space-y-2 md:col-span-2">
-                      <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                      <label className="text-sm font-medium text-foreground/80 flex items-center gap-2">
                         <BookOpen className="h-4 w-4" />
                         Select Course *
                       </label>
                       <select
                         value={selectedCourseId}
                         onChange={(e) => setSelectedCourseId(e.target.value)}
-                        className="w-full p-2 border rounded-md bg-background"
+                        className="w-full p-2 border border-input rounded-md bg-background/50"
                         required
                       >
                         <option value="">Choose a course</option>
@@ -182,12 +187,12 @@ export default function QuizBuilder() {
 
                   {/* Questions Section */}
                   <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <h2 className="text-xl font-semibold text-gray-800">Questions</h2>
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                      <h2 className="text-xl font-semibold text-foreground/90">Questions</h2>
                       <Button
                         type="button"
                         onClick={addQuestion}
-                        className="flex items-center gap-2"
+                        className="flex items-center gap-2 w-full sm:w-auto"
                       >
                         <Plus className="h-4 w-4" />
                         Add Question
@@ -195,16 +200,16 @@ export default function QuizBuilder() {
                     </div>
 
                     {questions.length === 0 && (
-                      <div className="text-center py-12 text-gray-500 border-2 border-dashed border-muted rounded-lg bg-accent/10">
-                        <HelpCircle className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                      <div className="text-center py-12 text-muted-foreground border-2 border-dashed border-muted rounded-lg bg-accent/5">
+                        <HelpCircle className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
                         <p className="text-lg font-medium">No questions added yet</p>
                         <p className="text-sm">Click &quot;Add Question&quot; to start building your quiz</p>
                       </div>
                     )}
 
                     {questions.map((question, index) => (
-                      <Card key={index} className="border border-muted hover:border-primary/50 transition-colors bg-card shadow-sm">
-                        <CardHeader className="pb-3 border-b bg-muted/20">
+                      <Card key={index} className="border border-white/10 hover:border-primary/50 transition-colors bg-card/40 backdrop-blur-md shadow-sm">
+                        <CardHeader className="pb-3 border-b border-white/5 bg-muted/10">
                           <div className="flex items-center justify-between">
                             <CardTitle className="text-lg">Question {index + 1}</CardTitle>
                             <Button
@@ -222,22 +227,22 @@ export default function QuizBuilder() {
                           {/* Question Text and Type */}
                           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                             <div className="md:col-span-3 space-y-2">
-                              <label className="text-sm font-medium text-gray-700">Question Text *</label>
+                              <label className="text-sm font-medium text-foreground/80">Question Text *</label>
                               <Input
                                 type="text"
                                 placeholder="Enter your question here"
                                 value={question.question}
                                 onChange={(e) => updateQuestion(index, 'question', e.target.value)}
-                                className="w-full"
+                                className="w-full bg-background/50"
                                 required
                               />
                             </div>
                             <div className="space-y-2">
-                              <label className="text-sm font-medium text-gray-700">Type</label>
+                              <label className="text-sm font-medium text-foreground/80">Type</label>
                               <select
                                 value={question.type}
                                 onChange={(e) => updateQuestion(index, 'type', e.target.value)}
-                                className="w-full p-2 border rounded-md bg-background"
+                                className="w-full p-2 border border-input rounded-md bg-background/50"
                               >
                                 <option value="single">Single Choice</option>
                                 <option value="multiple">Multiple Choice</option>
@@ -247,7 +252,7 @@ export default function QuizBuilder() {
 
                           {/* Answer Options */}
                           <div className="space-y-3">
-                            <label className="text-sm font-medium text-gray-700">Answer Options *</label>
+                            <label className="text-sm font-medium text-foreground/80">Answer Options *</label>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                               {question.options.map((option, optionIndex) => {
                                 const isSelected = question.correctAnswers.includes(optionIndex);
@@ -265,7 +270,7 @@ export default function QuizBuilder() {
                                         newOptions[optionIndex] = e.target.value;
                                         updateQuestion(index, 'option', newOptions);
                                       }}
-                                      className={`flex-1 ${isSelected ? 'border-primary' : ''}`}
+                                      className={`flex-1 bg-background/50 ${isSelected ? 'border-primary' : ''}`}
                                       required
                                     />
                                   </div>
@@ -276,7 +281,7 @@ export default function QuizBuilder() {
 
                           {/* Correct Answer Selector */}
                           <div className="space-y-3">
-                            <label className="text-sm font-medium text-gray-700">
+                            <label className="text-sm font-medium text-foreground/80">
                               {question.type === 'single' ? 'Select Correct Answer *' : 'Select Correct Answers *'}
                             </label>
                             <div className="flex flex-wrap gap-2">
@@ -301,7 +306,7 @@ export default function QuizBuilder() {
                                     }}
                                     className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 border-2 ${isSelected
                                       ? 'bg-primary border-primary text-primary-foreground shadow-md'
-                                      : 'bg-background border-muted text-muted-foreground hover:border-primary/50 hover:text-primary'
+                                      : 'bg-background/50 border-muted text-muted-foreground hover:border-primary/50 hover:text-primary'
                                       }`}
                                   >
                                     Option {String.fromCharCode(65 + optionIndex)}
@@ -317,10 +322,10 @@ export default function QuizBuilder() {
 
                   {/* Submit Button */}
                   {questions.length > 0 && (
-                    <div className="flex justify-end pt-6 border-t">
+                    <div className="flex justify-end pt-6 border-t border-white/10">
                       <Button
                         type="submit"
-                        className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 px-8 py-2 text-lg"
+                        className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 px-8 py-2 text-lg shadow-lg"
                       >
                         <Save className="h-5 w-5" />
                         Create Quiz

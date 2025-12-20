@@ -123,9 +123,13 @@ export default function Profile() {
   const gravatarUrl = `https://www.gravatar.com/avatar/${user.email}?d=identicon&s=150`;
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-background overflow-x-hidden">
+      <div className="max-w-full mx-auto px-3 sm:px-4 py-8 relative">
+        {/* Blurred Decorative Background Elements - Hidden on mobile */}
+        <div className="hidden sm:block absolute top-20 -left-20 w-72 h-72 bg-primary/10 rounded-full blur-[100px] -z-0 pointer-events-none" />
+        <div className="hidden sm:block absolute bottom-40 -right-20 w-96 h-96 bg-blue-500/10 rounded-full blur-[120px] -z-0 pointer-events-none" />
+
+        <div className="max-w-4xl mx-auto relative z-10">
           <div className="flex justify-between items-center mb-8">
             <h1 className="text-3xl font-bold">My Profile</h1>
             {!isEditing && (
@@ -138,8 +142,9 @@ export default function Profile() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Profile Overview */}
             <div className="lg:col-span-1">
-              <Card>
-                <CardContent className="p-6">
+              <Card className="border-none shadow-premium bg-card/30 backdrop-blur-2xl border border-white/5 overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent pointer-events-none" />
+                <CardContent className="p-6 relative z-10">
                   <div className="text-center">
                     <div className="relative w-24 h-24 mx-auto mb-4">
                       <Image
@@ -161,11 +166,12 @@ export default function Profile() {
               </Card>
 
               {/* Account Stats */}
-              <Card className="mt-6">
-                <CardHeader>
+              <Card className="mt-6 border-none shadow-premium bg-card/30 backdrop-blur-2xl border border-white/5 overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent pointer-events-none" />
+                <CardHeader className="relative z-10">
                   <CardTitle className="text-lg">Account Information</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-3">
+                <CardContent className="space-y-3 relative z-10">
                   <div className="flex items-center gap-3">
                     <Calendar className="h-4 w-4 text-muted-foreground" />
                     <div>
@@ -195,14 +201,15 @@ export default function Profile() {
 
             {/* Profile Form */}
             <div className="lg:col-span-2">
-              <Card>
-                <CardHeader>
+              <Card className="border-none shadow-premium bg-card/30 backdrop-blur-2xl border border-white/5 overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent pointer-events-none" />
+                <CardHeader className="relative z-10 border-b border-white/5">
                   <CardTitle>Personal Information</CardTitle>
                   <CardDescription>
                     Update your account details and preferences
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="relative z-10 pt-6">
                   {errors.general && (
                     <div className="mb-4 p-3 bg-destructive/10 border border-destructive/20 rounded-md">
                       <p className="text-destructive text-sm">{errors.general}</p>

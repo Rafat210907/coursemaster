@@ -180,10 +180,10 @@ export default function AdminCourses() {
     <div className="min-h-screen bg-background">
       <div className="flex">
         <AdminSidebar />
-        <div className="flex-1 container mx-auto px-6 py-8">
-          <div className="flex justify-between items-center mb-8">
-            <h1 className="text-3xl font-bold">Course Management</h1>
-            <Button onClick={() => setShowForm(true)}>
+        <div className="flex-1 w-full px-4 md:px-6 py-8 overflow-x-hidden">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+            <h1 className="text-2xl md:text-3xl font-bold">Course Management</h1>
+            <Button onClick={() => setShowForm(true)} className="w-full sm:w-auto">
               <Plus className="h-4 w-4 mr-2" />
               Add Course
             </Button>
@@ -292,7 +292,7 @@ export default function AdminCourses() {
                           </div>
 
                           {isInstructorDropdownOpen && (
-                            <div className="absolute z-50 mt-1 w-full max-w-[300px] md:max-w-none bg-popover text-popover-foreground border rounded-md shadow-xl animate-in fade-in zoom-in duration-200">
+                            <div className="absolute z-50 mt-1 w-[calc(100vw-4rem)] md:w-full max-w-[300px] md:max-w-none left-0 bg-popover text-popover-foreground border rounded-md shadow-xl animate-in fade-in zoom-in duration-200">
                               <div className="p-2 border-b sticky top-0 bg-popover z-10">
                                 <div className="relative">
                                   <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
@@ -506,9 +506,11 @@ export default function AdminCourses() {
 
           {!showForm && (
             loading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 relative">
+                <div className="absolute top-20 -left-20 w-72 h-72 bg-primary/10 rounded-full blur-[100px] -z-0 pointer-events-none" />
+                <div className="absolute bottom-40 -right-20 w-96 h-96 bg-blue-500/10 rounded-full blur-[120px] -z-0 pointer-events-none" />
                 {Array.from({ length: 6 }).map((_, i) => (
-                  <Card key={i}>
+                  <Card key={i} className="bg-card/30 backdrop-blur-sm border-white/5">
                     <CardContent className="p-6">
                       <div className="animate-pulse">
                         <div className="h-4 bg-muted rounded mb-2"></div>
@@ -520,14 +522,20 @@ export default function AdminCourses() {
                 ))}
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 relative">
+                {/* Blurred Decorative Background Elements */}
+                <div className="absolute top-20 -left-20 w-72 h-72 bg-primary/10 rounded-full blur-[100px] -z-0 pointer-events-none" />
+                <div className="absolute bottom-40 -right-20 w-96 h-96 bg-blue-500/10 rounded-full blur-[120px] -z-0 pointer-events-none" />
+
                 {courses.map((course) => (
-                  <Card key={course._id} className="hover:shadow-lg transition-shadow">
-                    <CardHeader>
+                  <Card key={course._id} className="group border-none shadow-premium overflow-hidden transition-all hover:translate-y-[-2px] bg-card/30 backdrop-blur-2xl border border-white/5 relative z-10">
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent pointer-events-none" />
+                    <div className="h-1.5 bg-gradient-to-r from-primary to-primary/40" />
+                    <CardHeader className="relative z-10">
                       <CardTitle className="line-clamp-2">{course.title}</CardTitle>
                       <CardDescription>{course.category}</CardDescription>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="relative z-10">
                       <div className="space-y-3">
                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
                           <BookOpen className="h-4 w-4" />
@@ -547,7 +555,7 @@ export default function AdminCourses() {
                         </div>
                       </div>
                     </CardContent>
-                    <div className="p-6 pt-0 flex gap-2">
+                    <div className="p-6 pt-0 flex gap-2 relative z-10">
                       <Button variant="outline" size="sm" onClick={() => handleEdit(course)}>
                         <Edit className="h-4 w-4" />
                       </Button>

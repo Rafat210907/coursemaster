@@ -107,18 +107,22 @@ export default function CourseDetails() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="container mx-auto px-4 py-8 relative">
+        {/* Blurred Decorative Background Elements */}
+        <div className="absolute top-20 -left-20 w-72 h-72 bg-primary/10 rounded-full blur-[100px] -z-0 pointer-events-none" />
+        <div className="absolute bottom-40 -right-20 w-96 h-96 bg-blue-500/10 rounded-full blur-[120px] -z-0 pointer-events-none" />
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 relative z-10">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
             <div>
-              <h1 className="text-3xl font-bold mb-4">{course.title}</h1>
-              <p className="text-xl text-muted-foreground mb-4">{course.description}</p>
+              <h1 className="text-2xl md:text-3xl font-bold mb-4">{course.title}</h1>
+              <p className="text-lg md:text-xl text-muted-foreground mb-4">{course.description}</p>
 
               <div className="flex flex-wrap items-center gap-4 mb-6">
                 <div className="flex items-center gap-1">
-                  <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                  <span className="text-sm">{course.averageRating?.toFixed(1) || 'N/A'}</span>
+                  <Star className="h-4 w-4 fill-yellow-400 text-yellow-500" />
+                  <span className="text-sm font-medium">{course.averageRating?.toFixed(1) || 'N/A'}</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <MessageSquare className="h-4 w-4 text-muted-foreground" />
@@ -136,7 +140,7 @@ export default function CourseDetails() {
 
               <div className="flex flex-wrap gap-2 mb-6">
                 {course.tags.map((tag) => (
-                  <span key={tag} className="bg-secondary text-secondary-foreground px-3 py-1 rounded-full text-sm">
+                  <span key={tag} className="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium">
                     {tag}
                   </span>
                 ))}
@@ -145,17 +149,18 @@ export default function CourseDetails() {
 
             {/* Syllabus */}
             {course.syllabus && course.syllabus.length > 0 && (
-              <Card>
-                <CardHeader>
+              <Card className="border-none shadow-premium bg-card/30 backdrop-blur-2xl border border-white/5 overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent pointer-events-none" />
+                <CardHeader className="relative z-10 border-b border-white/5">
                   <CardTitle className="flex items-center gap-2">
-                    <BookOpen className="h-5 w-5" />
+                    <BookOpen className="h-5 w-5 text-primary" />
                     Course Syllabus
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="relative z-10 pt-6">
                   <div className="space-y-4">
                     {course.syllabus.map((item, index) => (
-                      <div key={index} className="border-l-2 border-primary pl-4">
+                      <div key={index} className="border-l-2 border-primary/30 pl-4 hover:border-primary transition-colors">
                         <h3 className="font-semibold mb-2">{item.title}</h3>
                         <p className="text-muted-foreground text-sm">{item.content}</p>
                       </div>
@@ -166,10 +171,11 @@ export default function CourseDetails() {
             )}
 
             {/* Reviews */}
-            <Card>
-              <CardHeader>
+            <Card className="border-none shadow-premium bg-card/30 backdrop-blur-2xl border border-white/5 overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent pointer-events-none" />
+              <CardHeader className="relative z-10 border-b border-white/5">
                 <CardTitle className="flex items-center gap-2">
-                  <MessageSquare className="h-5 w-5" />
+                  <MessageSquare className="h-5 w-5 text-primary" />
                   Reviews ({reviews.length})
                 </CardTitle>
                 {user && isEnrolled && !showReviewForm && (
@@ -222,7 +228,7 @@ export default function CourseDetails() {
                 <div className="space-y-4">
                   {reviews.length > 0 ? (
                     reviews.map((review) => (
-                      <div key={review._id} className="border-b pb-4 last:border-b-0">
+                      <div key={review._id} className="border-b border-white/5 pb-4 last:border-b-0">
                         <div className="flex items-center gap-2 mb-2">
                           <div className="font-semibold text-sm">
                             {typeof review.user === 'object' ? review.user.name : 'Anonymous'}
@@ -233,7 +239,7 @@ export default function CourseDetails() {
                             {[...Array(5)].map((_, i) => (
                               <Star
                                 key={i}
-                                className={`h-4 w-4 ${i < review.rating ? 'fill-yellow-400 text-yellow-400' : 'text-muted-foreground'}`}
+                                className={`h-4 w-4 ${i < review.rating ? 'fill-yellow-400 text-yellow-500' : 'text-muted-foreground/30'}`}
                               />
                             ))}
                           </div>
@@ -241,11 +247,11 @@ export default function CourseDetails() {
                             {new Date(review.createdAt).toLocaleDateString()}
                           </span>
                         </div>
-                        <p className="text-sm">{review.comment}</p>
+                        <p className="text-sm text-muted-foreground/90">{review.comment}</p>
                       </div>
                     ))
                   ) : (
-                    <p className="text-muted-foreground">No reviews yet. Be the first to review this course!</p>
+                    <p className="text-muted-foreground italic">No reviews yet. Be the first to review this course!</p>
                   )}
                 </div>
               </CardContent>
@@ -255,8 +261,10 @@ export default function CourseDetails() {
           {/* Sidebar */}
           <div className="lg:col-span-1 space-y-4">
             {/* Enroll card */}
-            <Card className="sticky top-4">
-              <CardContent className="p-6">
+            <Card className="sticky top-4 border-none shadow-premium bg-card/30 backdrop-blur-2xl border border-white/5 overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent pointer-events-none" />
+              <div className="h-2 bg-gradient-to-r from-primary to-primary/40" />
+              <CardContent className="p-6 relative z-10">
                 <div className="text-center mb-6">
                   <div className="text-3xl font-bold mb-2">${course.price}</div>
                   <div className="text-muted-foreground">One-time payment</div>

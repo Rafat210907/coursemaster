@@ -4,6 +4,7 @@ import courseReducer from './slices/courseSlice';
 import enrollmentReducer from './slices/enrollmentSlice';
 import adminReducer from './slices/adminSlice';
 import tutorReducer from './slices/tutorSlice';
+import notificationReducer from './slices/notificationSlice';
 
 export const store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ export const store = configureStore({
     enrollments: enrollmentReducer,
     admin: adminReducer,
     tutors: tutorReducer,
+    notifications: notificationReducer,
   },
 });
 

@@ -125,6 +125,26 @@ export interface Review {
   createdAt: string;
 }
 
+export interface Notice {
+  _id: string;
+  title: string;
+  content: string;
+  targetType: 'all' | 'course';
+  targetCourses: string[] | Course[];
+  createdBy: string | User;
+  createdAt: string;
+}
+
+export interface Notification {
+  _id: string;
+  recipient: string;
+  message: string;
+  type: 'notice' | 'assignment' | 'grade' | 'system';
+  referenceId?: string;
+  isRead: boolean;
+  createdAt: string;
+}
+
 export interface Analytics {
   totalStudents: number;
   totalCourses: number;

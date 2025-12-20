@@ -47,14 +47,14 @@ export default function AdminDashboard() {
         <AdminSidebar />
 
         {/* Main Content */}
-        <div className="flex-1 p-8">
+        <div className="flex-1 p-4 md:p-8 overflow-x-hidden">
           <div className="mb-8">
             <h1 className="text-3xl font-bold">Analytics Dashboard</h1>
             <p className="text-muted-foreground">Monitor your platform&apos;s performance</p>
           </div>
 
           {loading && (
-            <div className="animate-pulse">
+            <div className="animate-pulse relative">
               <div className="h-8 bg-muted rounded mb-8"></div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 {Array.from({ length: 4 }).map((_, i) => (
@@ -75,10 +75,15 @@ export default function AdminDashboard() {
           )}
 
           {!loading && !error && analytics && (
-            <>
+            <div className="relative">
+              {/* Blurred Decorative Background Elements */}
+              <div className="absolute top-20 -left-20 w-72 h-72 bg-primary/10 rounded-full blur-[100px] -z-0 pointer-events-none" />
+              <div className="absolute bottom-40 -right-20 w-96 h-96 bg-blue-500/10 rounded-full blur-[120px] -z-0 pointer-events-none" />
+
               {/* Stats Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <Card>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 relative z-10">
+                <Card className="group border-none shadow-premium overflow-hidden transition-all hover:translate-y-[-2px] bg-card/30 backdrop-blur-2xl border border-white/5">
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent pointer-events-none" />
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">Total Students</CardTitle>
                     <Users className="h-4 w-4 text-muted-foreground" />
@@ -88,7 +93,8 @@ export default function AdminDashboard() {
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="group border-none shadow-premium overflow-hidden transition-all hover:translate-y-[-2px] bg-card/30 backdrop-blur-2xl border border-white/5">
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent pointer-events-none" />
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">Total Courses</CardTitle>
                     <BookOpen className="h-4 w-4 text-muted-foreground" />
@@ -98,7 +104,8 @@ export default function AdminDashboard() {
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="group border-none shadow-premium overflow-hidden transition-all hover:translate-y-[-2px] bg-card/30 backdrop-blur-2xl border border-white/5">
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent pointer-events-none" />
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">Total Enrollments</CardTitle>
                     <UserCheck className="h-4 w-4 text-muted-foreground" />
@@ -108,7 +115,8 @@ export default function AdminDashboard() {
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="group border-none shadow-premium overflow-hidden transition-all hover:translate-y-[-2px] bg-card/30 backdrop-blur-2xl border border-white/5">
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent pointer-events-none" />
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
                     <TrendingUp className="h-4 w-4 text-muted-foreground" />
@@ -120,8 +128,8 @@ export default function AdminDashboard() {
               </div>
 
               {/* Charts */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <Card>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 relative z-10">
+                <Card className="border-none shadow-premium bg-card/30 backdrop-blur-2xl border border-white/5">
                   <CardHeader>
                     <CardTitle>Course Popularity</CardTitle>
                     <CardDescription>Most enrolled courses</CardDescription>
@@ -139,7 +147,7 @@ export default function AdminDashboard() {
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="border-none shadow-premium bg-card/30 backdrop-blur-2xl border border-white/5">
                   <CardHeader>
                     <CardTitle>Monthly Revenue</CardTitle>
                     <CardDescription>Revenue over time</CardDescription>
@@ -157,7 +165,7 @@ export default function AdminDashboard() {
                   </CardContent>
                 </Card>
               </div>
-            </>
+            </div>
           )}
         </div>
       </div>
