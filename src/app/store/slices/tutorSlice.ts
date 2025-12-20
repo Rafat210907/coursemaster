@@ -33,19 +33,31 @@ export const fetchTutor = createAsyncThunk('tutors/fetchTutor', async (id: strin
   return response.data;
 });
 
-export const createTutor = createAsyncThunk('tutors/createTutor', async (tutorData: Omit<Tutor, '_id' | 'courses' | 'createdAt'>) => {
-  const response = await api.post('/tutors', tutorData);
-  return response.data;
+export const createTutor = createAsyncThunk('tutors/createTutor', async (tutorData: Omit<Tutor, '_id' | 'courses' | 'createdAt'>, { rejectWithValue }) => {
+  try {
+    const response = await api.post('/tutors', tutorData);
+    return response.data;
+  } catch (err: any) {
+    return rejectWithValue(err.response?.data?.error || err.response?.data?.message || 'Failed to create tutor');
+  }
 });
 
-export const updateTutor = createAsyncThunk('tutors/updateTutor', async ({ id, tutorData }: { id: string; tutorData: Partial<Tutor> }) => {
-  const response = await api.put(`/tutors/${id}`, tutorData);
-  return response.data;
+export const updateTutor = createAsyncThunk('tutors/updateTutor', async ({ id, tutorData }: { id: string; tutorData: Partial<Tutor> }, { rejectWithValue }) => {
+  try {
+    const response = await api.put(`/tutors/${id}`, tutorData);
+    return response.data;
+  } catch (err: any) {
+    return rejectWithValue(err.response?.data?.error || err.response?.data?.message || 'Failed to update tutor');
+  }
 });
 
-export const deleteTutor = createAsyncThunk('tutors/deleteTutor', async (id: string) => {
-  await api.delete(`/tutors/${id}`);
-  return id;
+export const deleteTutor = createAsyncThunk('tutors/deleteTutor', async (id: string, { rejectWithValue }) => {
+  try {
+    await api.delete(`/tutors/${id}`);
+    return id;
+  } catch (err: any) {
+    return rejectWithValue(err.response?.data?.error || err.response?.data?.message || 'Failed to delete tutor');
+  }
 });
 
 export const fetchTutorStats = createAsyncThunk('tutors/fetchTutorStats', async (id: string) => {
@@ -84,7 +96,7 @@ const tutorSlice = createSlice({
       })
       .addCase(createTutor.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || 'Failed to create tutor';
+        state.error = (action.payload as string) || action.error.message || 'Failed to create tutor';
       })
       .addCase(updateTutor.pending, (state) => {
         state.loading = true;
@@ -98,7 +110,7 @@ const tutorSlice = createSlice({
       })
       .addCase(updateTutor.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || 'Failed to update tutor';
+        state.error = (action.payload as string) || action.error.message || 'Failed to update tutor';
       })
       .addCase(deleteTutor.pending, (state) => {
         state.loading = true;

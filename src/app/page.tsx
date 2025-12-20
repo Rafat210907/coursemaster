@@ -115,7 +115,7 @@ export default function Home() {
                   <CardContent>
                     <div className="space-y-2">
                       <p className="text-sm text-muted-foreground">
-                        Instructor: {typeof course.instructor === 'object' ? course.instructor.name : course.instructor}
+                        Instructors: {(course.instructors || []).map(inst => typeof inst === 'object' ? inst.name : 'Unknown').join(', ')}
                       </p>
                       <p className="text-sm text-muted-foreground">Duration: {course.duration} hours</p>
                       <div className="flex flex-wrap gap-1">

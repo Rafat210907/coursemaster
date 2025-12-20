@@ -197,7 +197,7 @@ export default function CourseDetails() {
                         onChange={(e) => setNewReview({ ...newReview, rating: Number(e.target.value) })}
                         className="border border-input bg-background px-3 py-2 rounded-md"
                       >
-                        {[1,2,3,4,5].map(n => <option key={n} value={n}>{n} Stars</option>)}
+                        {[1, 2, 3, 4, 5].map(n => <option key={n} value={n}>{n} Stars</option>)}
                       </select>
                     </div>
                     <div className="mb-4">
@@ -292,15 +292,20 @@ export default function CourseDetails() {
               </CardContent>
             </Card>
 
-            {/* Instructor card (no rating actions) */}
-            {typeof course.instructor === 'object' && (
-              <TutorCard
-                name={course.instructor.name}
-                expertise={course.instructor.expertise}
-                profileImage={course.instructor.profileImage}
-                activeCourseCount={Array.isArray(course.instructor.courses) ? course.instructor.courses.length : undefined}
-              />
-            )}
+            {/* Instructor cards */}
+            <div className="space-y-4">
+              {(course.instructors || []).map((instructor, index) => (
+                typeof instructor === 'object' && (
+                  <TutorCard
+                    key={instructor._id}
+                    name={instructor.name}
+                    expertise={instructor.expertise}
+                    profileImage={instructor.profileImage}
+                    activeCourseCount={Array.isArray(instructor.courses) ? instructor.courses.length : undefined}
+                  />
+                )
+              ))}
+            </div>
           </div>
         </div>
       </div>

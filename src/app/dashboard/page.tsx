@@ -71,10 +71,6 @@ export default function Dashboard() {
                 <BookOpen className="h-5 w-5" />
                 My Courses
               </Link>
-              <Link href="/dashboard/quizzes" className="flex items-center gap-3 px-3 py-2 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground">
-                <HelpCircle className="h-5 w-5" />
-                Quizzes
-              </Link>
             </nav>
           </div>
         </div>
@@ -82,127 +78,126 @@ export default function Dashboard() {
         {/* Main Content */}
         <div className="flex-1">
           <div className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Welcome back, {user.name}!</h1>
-          <p className="text-muted-foreground">Continue your learning journey</p>
-        </div>
-
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center gap-4">
-                <BookOpen className="h-8 w-8 text-primary" />
-                <div>
-                  <p className="text-2xl font-bold">{enrollments.length}</p>
-                  <p className="text-sm text-muted-foreground">Enrolled Courses</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center gap-4">
-                <TrendingUp className="h-8 w-8 text-green-600" />
-                <div>
-                  <p className="text-2xl font-bold">{inProgressCourses}</p>
-                  <p className="text-sm text-muted-foreground">In Progress</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center gap-4">
-                <Award className="h-8 w-8 text-yellow-600" />
-                <div>
-                  <p className="text-2xl font-bold">{completedCourses}</p>
-                  <p className="text-sm text-muted-foreground">Completed</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center gap-4">
-                <Clock className="h-8 w-8 text-blue-600" />
-                <div>
-                  <p className="text-2xl font-bold">{totalProgress.toFixed(0)}%</p>
-                  <p className="text-sm text-muted-foreground">Avg Progress</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Enrolled Courses */}
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold mb-6">My Courses</h2>
-          {validEnrollments.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {validEnrollments.map((enrollment: Enrollment) => (
-                <Card key={enrollment._id} className="hover:shadow-lg transition-shadow">
-                  <CardHeader>
-                    <CardTitle className="line-clamp-2">{(enrollment.course as Course)?.title || 'Unknown Course'}</CardTitle>
-                    <CardDescription>
-                      {(() => {
-                        const instructor = (enrollment.course as Course)?.instructor;
-                        if (typeof instructor === 'object' && instructor !== null) {
-                          return instructor.name;
-                        }
-                        return instructor || 'Unknown Instructor';
-                      })()}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <div>
-                        <div className="flex justify-between text-sm mb-2">
-                          <span>Progress</span>
-                          <span>{enrollment.progress}%</span>
-                        </div>
-                        <div className="w-full bg-secondary rounded-full h-2">
-                          <div
-                            className="bg-primary h-2 rounded-full transition-all duration-300"
-                            style={{ width: `${enrollment.progress}%` }}
-                          ></div>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Clock className="h-4 w-4" />
-                        <span>Status: {enrollment.status}</span>
-                      </div>
-                    </div>
-                  </CardContent>
-                  <div className="p-6 pt-0">
-                    <Link href={(enrollment.course as Course) ? `/lesson/${(enrollment.course as Course)._id}` : '#'}>
-                      <Button className="w-full" disabled={!(enrollment.course as Course)}>
-                        {enrollment.progress === 100 ? 'Review Course' : 'Continue Learning'}
-                      </Button>
-                    </Link>
-                  </div>
-                </Card>
-              ))}
+            <div className="mb-8">
+              <h1 className="text-3xl font-bold mb-2">Welcome back, {user.name}!</h1>
+              <p className="text-muted-foreground">Continue your learning journey</p>
             </div>
-          ) : (
-            <Card>
-              <CardContent className="p-8 text-center">
-                <BookOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-semibold mb-2">No courses yet</h3>
-                <p className="text-muted-foreground mb-4">Start your learning journey by enrolling in a course.</p>
-                <Link href="/">
-                  <Button>Browse Courses</Button>
-                </Link>
-              </CardContent>
-            </Card>
-          )}
+
+            {/* Stats Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-4">
+                    <BookOpen className="h-8 w-8 text-primary" />
+                    <div>
+                      <p className="text-2xl font-bold">{enrollments.length}</p>
+                      <p className="text-sm text-muted-foreground">Enrolled Courses</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-4">
+                    <TrendingUp className="h-8 w-8 text-green-600" />
+                    <div>
+                      <p className="text-2xl font-bold">{inProgressCourses}</p>
+                      <p className="text-sm text-muted-foreground">In Progress</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-4">
+                    <Award className="h-8 w-8 text-yellow-600" />
+                    <div>
+                      <p className="text-2xl font-bold">{completedCourses}</p>
+                      <p className="text-sm text-muted-foreground">Completed</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-4">
+                    <Clock className="h-8 w-8 text-blue-600" />
+                    <div>
+                      <p className="text-2xl font-bold">{totalProgress.toFixed(0)}%</p>
+                      <p className="text-sm text-muted-foreground">Avg Progress</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Enrolled Courses */}
+            <div className="mb-8">
+              <h2 className="text-2xl font-bold mb-6">My Courses</h2>
+              {validEnrollments.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {validEnrollments.map((enrollment: Enrollment) => (
+                    <Card key={enrollment._id} className="hover:shadow-lg transition-shadow">
+                      <CardHeader>
+                        <CardTitle className="line-clamp-2">{(enrollment.course as Course)?.title || 'Unknown Course'}</CardTitle>
+                        <CardDescription>
+                          {(() => {
+                            const course = enrollment.course as Course;
+                            const instructors = course?.instructors || [];
+                            const instructorNames = instructors.map(inst => typeof inst === 'object' && inst !== null ? inst.name : 'Unknown').join(', ');
+                            return instructorNames || 'Unknown Instructor';
+                          })()}
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-4">
+                          <div>
+                            <div className="flex justify-between text-sm mb-2">
+                              <span>Progress</span>
+                              <span>{enrollment.progress}%</span>
+                            </div>
+                            <div className="w-full bg-secondary rounded-full h-2">
+                              <div
+                                className="bg-primary h-2 rounded-full transition-all duration-300"
+                                style={{ width: `${enrollment.progress}%` }}
+                              ></div>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <Clock className="h-4 w-4" />
+                            <span>Status: {enrollment.status}</span>
+                          </div>
+                        </div>
+                      </CardContent>
+                      <div className="p-6 pt-0">
+                        <Link href={(enrollment.course as Course) ? `/lesson/${(enrollment.course as Course)._id}` : '#'}>
+                          <Button className="w-full" disabled={!(enrollment.course as Course)}>
+                            {enrollment.progress === 100 ? 'Review Course' : 'Continue Learning'}
+                          </Button>
+                        </Link>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              ) : (
+                <Card>
+                  <CardContent className="p-8 text-center">
+                    <BookOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                    <h3 className="text-lg font-semibold mb-2">No courses yet</h3>
+                    <p className="text-muted-foreground mb-4">Start your learning journey by enrolling in a course.</p>
+                    <Link href="/">
+                      <Button>Browse Courses</Button>
+                    </Link>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          </div>
         </div>
-      </div>
-      </div>
       </div>
     </div>
   );

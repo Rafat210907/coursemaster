@@ -17,7 +17,6 @@ export interface Tutor {
   experience: number;
   profileImage?: string;
   totalStudents: number;
-  isActive: boolean;
   courses: string[];
   createdAt: string;
 }
@@ -31,7 +30,7 @@ export interface Course {
   duration: number;
   tags: string[];
   category: string;
-  instructor: string | Tutor;
+  instructors: (string | Tutor)[];
   lessons: string[];
   batches: string[];
   createdAt: string;
@@ -65,15 +64,18 @@ export interface Lesson {
 export interface Quiz {
   _id: string;
   title: string;
-  lesson: string;
+  lesson?: string;
+  course: string;
   questions: {
     question: string;
     options: string[];
-    correctAnswer: number;
+    type: 'single' | 'multiple';
+    correctAnswer?: number;
+    correctAnswers: number[];
   }[];
   submissions: {
-    student: string;
-    answers: number[];
+    student: string | any;
+    answers: (number | number[])[];
     score: number;
     submittedAt: string;
   }[];
