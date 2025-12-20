@@ -49,7 +49,7 @@ export default function AdminDashboard() {
         {/* Main Content */}
         <div className="flex-1 p-4 md:p-8 overflow-x-hidden">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold">Analytics Dashboard</h1>
+            <h1 className="text-3xl font-bold">Admin Dashboard</h1>
             <p className="text-muted-foreground">Monitor your platform&apos;s performance</p>
           </div>
 

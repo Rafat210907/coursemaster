@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { BarChart3, BookOpen, Users, Plus, Menu, X, Megaphone } from 'lucide-react';
+import { BarChart3, BookOpen, Users, Plus, Menu, X, Megaphone, TrendingUp } from 'lucide-react';
 import { useState } from 'react';
 
 export function AdminSidebar() {
@@ -11,7 +11,8 @@ export function AdminSidebar() {
     const [isOpen, setIsOpen] = useState(false);
 
     const sidebarItems = [
-        { id: 'analytics', label: 'Analytics', icon: BarChart3, href: '/admin' },
+        { id: 'dashboard', label: 'Dashboard', icon: BarChart3, href: '/admin' },
+        { id: 'analytics', label: 'Analytics', icon: TrendingUp, href: '/admin/analytics' },
         { id: 'courses', label: 'Admin Courses', icon: BookOpen, href: '/admin/courses' },
         { id: 'tutors', label: 'Manage Tutors', icon: Users, href: '/admin/tutors' },
         { id: 'quiz', label: 'Create Quiz', icon: Plus, href: '/admin/quiz' },
