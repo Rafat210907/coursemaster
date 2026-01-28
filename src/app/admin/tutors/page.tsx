@@ -9,7 +9,7 @@ import { Input } from '../../../components/ui/Input';
 import { RootState, AppDispatch } from '../../store/store';
 import { Tutor } from '../../../types';
 import Image from 'next/image';
-import { Plus, Edit, Trash2, User, Users, Award } from 'lucide-react';
+import { Plus, Edit, Trash2, User, Users, Award, BookOpen } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 import { AdminSidebar } from '../../../components/AdminSidebar';
@@ -301,15 +301,34 @@ export default function AdminTutors() {
                             )}
                           </div>
 
+                          {/* Assigned Courses Section */}
+                          <div className="pt-4 border-t border-white/5">
+                            <h4 className="text-[10px] uppercase font-black text-muted-foreground/50 tracking-widest mb-3">Assigned Courses</h4>
+                            <div className="space-y-2 max-h-40 overflow-y-auto select-scrollbar pr-1">
+                              {tutor.courses && tutor.courses.length > 0 ? (
+                                tutor.courses.map((course: any, idx: number) => (
+                                  <div key={idx} className="flex items-center gap-2 bg-white/5 hover:bg-white/10 p-2 rounded-xl transition-all border border-white/5 group/course">
+                                    <div className="p-1.5 bg-primary/20 rounded-lg group-hover/course:bg-primary/30 transition-colors">
+                                      <BookOpen size={12} className="text-primary" />
+                                    </div>
+                                    <span className="text-xs font-semibold line-clamp-1 group-hover/course:text-primary transition-colors">{typeof course === 'object' ? course.title : 'Course ID: ' + course}</span>
+                                  </div>
+                                ))
+                              ) : (
+                                <p className="text-[10px] text-muted-foreground italic bg-white/5 p-3 rounded-xl border border-dashed border-white/10 text-center">No courses assigned yet</p>
+                              )}
+                            </div>
+                          </div>
+
                           <div className="pt-4 border-t border-white/5 flex items-center justify-between text-sm">
-                            <div className="flex items-center gap-4">
-                              <div className="flex items-center gap-1.5 bg-blue-500/10 px-2 py-1 rounded-full text-blue-600">
+                            <div className="flex items-center gap-3">
+                              <div className="flex items-center gap-1.5 bg-indigo-500/10 px-2.5 py-1.5 rounded-xl text-indigo-400 border border-indigo-500/10">
                                 <Users size={14} />
-                                <span className="font-semibold">{tutor.totalStudents}</span>
+                                <span className="font-bold">{tutor.totalStudents}</span>
                               </div>
-                              <div className="flex items-center gap-1.5 bg-green-500/10 px-2 py-1 rounded-full text-green-600">
+                              <div className="flex items-center gap-1.5 bg-emerald-500/10 px-2.5 py-1.5 rounded-xl text-emerald-400 border border-emerald-500/10">
                                 <Award size={14} />
-                                <span className="font-semibold">{tutor.experience}y</span>
+                                <span className="font-bold">{tutor.experience}y</span>
                               </div>
                             </div>
                           </div>

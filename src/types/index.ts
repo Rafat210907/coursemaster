@@ -17,7 +17,7 @@ export interface Tutor {
   experience: number;
   profileImage?: string;
   totalStudents: number;
-  courses: string[];
+  courses: (string | Course)[];
   createdAt: string;
 }
 

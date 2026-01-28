@@ -110,7 +110,7 @@
 
 @layer components {
   .glass {
-    @apply bg-white/5 backdrop-blur-xl border border-white/10 shadow-glass;
+    @apply bg-[#0d0816]/60 backdrop-blur-xl border border-white/10 shadow-glass relative z-50;
   }
 
   .glass-card {
@@ -144,6 +144,17 @@
 
   .neon-border {
     box-shadow: 0 0 15px hsla(270, 90%, 60%, 0.3);
+  }
+
+  .react-loading-skeleton {
+    --base-color: #0d0816 !important;
+    --highlight-color: #1a1425 !important;
+    background-color: var(--base-color) !important;
+  }
+
+  /* Prevent overlapping of search bar */
+  .search-filter-container {
+    @apply relative z-50;
   }
 
   .animate-float {

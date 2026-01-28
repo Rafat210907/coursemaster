@@ -49,7 +49,7 @@ export default function Home() {
             </p>
           </motion.div>
 
-          <div className="mb-12 flex flex-col sm:flex-row gap-6 items-center justify-center">
+          <div className="flex flex-col md:flex-row gap-4 mb-12 relative z-40 items-center justify-center search-filter-container">
             <div className="relative flex-1 max-w-lg group">
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground h-5 w-5 group-focus-within:text-primary transition-colors" />
               <Input
@@ -85,16 +85,19 @@ export default function Home() {
           {loading && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {Array.from({ length: 6 }).map((_, i) => (
-                <Card key={i} className="glass-card h-[400px]">
-                  <CardHeader>
-                    <Skeleton height={32} baseColor="#1f1f23" highlightColor="#2d2d33" />
-                    <Skeleton height={20} width="60%" baseColor="#1f1f23" highlightColor="#2d2d33" />
+                <Card key={i} className="glass-card h-full min-h-[420px] flex flex-col">
+                  <CardHeader className="pt-8">
+                    <Skeleton height={32} baseColor="#110d18" highlightColor="#221a31" borderRadius={12} />
+                    <Skeleton height={20} width="60%" baseColor="#110d18" highlightColor="#221a31" borderRadius={8} className="mt-2" />
                   </CardHeader>
-                  <CardContent>
-                    <Skeleton count={4} baseColor="#1f1f23" highlightColor="#2d2d33" />
+                  <CardContent className="flex-grow">
+                    <Skeleton count={3} baseColor="#110d18" highlightColor="#221a31" borderRadius={8} className="mb-2" />
                   </CardContent>
-                  <CardFooter className="mt-auto">
-                    <Skeleton height={48} width="100%" baseColor="#1f1f23" highlightColor="#2d2d33" />
+                  <CardFooter className="mt-auto p-6 pt-0 border-t border-white/5 space-y-4 flex flex-col items-stretch">
+                    <div className="flex justify-between items-center w-full mt-4">
+                      <Skeleton height={40} width={80} baseColor="#110d18" highlightColor="#221a31" borderRadius={12} />
+                      <Skeleton height={48} width={140} baseColor="#110d18" highlightColor="#221a31" borderRadius={16} />
+                    </div>
                   </CardFooter>
                 </Card>
               ))}
@@ -173,21 +176,17 @@ export default function Home() {
                       </div>
                     </CardContent>
 
-                    <CardFooter className="flex justify-between items-center relative z-10 p-6 pt-0 border-t border-white/5 mt-4">
-                      <div className="flex flex-col">
-                        <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold">Price</span>
-                        <span className="text-2xl font-black text-white">${course.price}</span>
+                    <CardFooter className="flex justify-between items-center relative z-10 p-6 pt-4 border-t border-white/5 mt-auto">
+                      <div className="flex flex-col gap-0.5">
+                        <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-black opacity-60">Price</span>
+                        <div className="flex items-baseline gap-0.5 leading-none">
+                          <span className="text-sm font-bold text-primary">$</span>
+                          <span className="text-2xl font-black text-white tracking-tighter">{course.price}</span>
+                        </div>
                       </div>
                       <Link href={`/course/${course._id}`}>
-                        <Button className="rounded-2xl px-6 h-12 bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20 group transition-all">
+                        <Button className="rounded-2xl px-8 h-11 bg-primary hover:bg-primary/90 shadow-[0_8px_20px_-5px_rgba(139,92,246,0.4)] group transition-all duration-300 font-bold border-none text-sm">
                           Enroll Now
-                          <motion.span
-                            className="inline-block ml-2"
-                            initial={{ x: 0 }}
-                            whileHover={{ x: 5 }}
-                          >
-                            →
-                          </motion.span>
                         </Button>
                       </Link>
                     </CardFooter>
