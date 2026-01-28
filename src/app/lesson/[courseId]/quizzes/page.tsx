@@ -81,7 +81,7 @@ export default function CourseQuizzes() {
             toast.success('Quiz submitted successfully!');
         } catch (err: any) {
             console.error('Error submitting quiz:', err);
-            toast.error(err.response?.data?.error || 'Failed to submit quiz');
+            toast.error(err.response?.data?.message || err.response?.data?.error || 'Failed to submit quiz');
         }
     };
 
