@@ -19,17 +19,25 @@ const initialState: AuthState = {
 
 export const register = createAsyncThunk(
   'auth/register',
-  async ({ name, email, password }: { name: string; email: string; password: string }) => {
-    const response = await api.post('/auth/register', { name, email, password });
-    return response.data;
+  async ({ name, email, password }: { name: string; email: string; password: string }, { rejectWithValue }) => {
+    try {
+      const response = await api.post('/auth/register', { name, email, password });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Registration failed');
+    }
   }
 );
 
 export const login = createAsyncThunk(
   'auth/login',
-  async ({ email, password }: { email: string; password: string }) => {
-    const response = await api.post('/auth/login', { email, password });
-    return response.data;
+  async ({ email, password }: { email: string; password: string }, { rejectWithValue }) => {
+    try {
+      const response = await api.post('/auth/login', { email, password });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Login failed');
+    }
   }
 );
 
@@ -77,7 +85,7 @@ const authSlice = createSlice({
       })
       .addCase(register.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || 'Registration failed';
+        state.error = (action.payload as string) || action.error.message || 'Registration failed';
         toast.error(state.error);
       })
       .addCase(login.pending, (state) => {
@@ -92,7 +100,7 @@ const authSlice = createSlice({
       })
       .addCase(login.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || 'Login failed';
+        state.error = (action.payload as string) || action.error.message || 'Login failed';
         toast.error(state.error);
       })
       .addCase(getProfile.fulfilled, (state, action) => {

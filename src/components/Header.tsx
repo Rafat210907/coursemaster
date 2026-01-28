@@ -195,10 +195,10 @@ export default function Header() {
             </>
           ) : (
             <>
-              <Link href="/login">
+              <Link href="/login" prefetch={false}>
                 <Button variant="ghost" size="sm" className="h-9 text-base">Login</Button>
               </Link>
-              <Link href="/register">
+              <Link href="/register" prefetch={false}>
                 <Button size="sm" className="h-9 text-base">Register</Button>
               </Link>
             </>
@@ -296,10 +296,10 @@ export default function Header() {
               </>
             ) : (
               <div className="flex flex-col space-y-2 pt-2 border-t">
-                <Link href="/login" onClick={() => setIsMenuOpen(false)}>
+                <Link href="/login" onClick={() => setIsMenuOpen(false)} prefetch={false}>
                   <Button variant="outline" className="w-full">Login</Button>
                 </Link>
-                <Link href="/register" onClick={() => setIsMenuOpen(false)}>
+                <Link href="/register" onClick={() => setIsMenuOpen(false)} prefetch={false}>
                   <Button className="w-full">Register</Button>
                 </Link>
               </div>
