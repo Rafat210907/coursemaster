@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchEnrolledCourses } from '../store/slices/enrollmentSlice';
 import Link from 'next/link';
@@ -8,13 +8,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../..
 import { Button } from '../../components/ui/Button';
 import { RootState, AppDispatch } from '../store/store';
 import { Enrollment, Course } from '../../types';
-import { BookOpen, TrendingUp, Clock, Award, HelpCircle, Menu, X, Megaphone, Bell, ChevronRight } from 'lucide-react';
+import { BookOpen, TrendingUp, Clock, Award, HelpCircle, Megaphone, Bell, ChevronRight } from 'lucide-react';
 import { fetchNotifications } from '../store/slices/notificationSlice';
-import { useState } from 'react';
-// import { AnimatePresence, motion } from 'framer-motion';
-// import { AnimatePresence, motion } from 'framer-motion';
-// import { format } from 'date-fns';
-// import { markRead, markReadByNoticeId } from '../store/slices/notificationSlice';
+import { AnimatePresence, motion } from 'framer-motion';
+import { format } from 'date-fns';
+import { markRead, markReadByNoticeId } from '../store/slices/notificationSlice';
+import { DashboardSidebar } from '../../components/DashboardSidebar';
 
 export default function Dashboard() {
   const dispatch = useDispatch<AppDispatch>();
@@ -22,7 +21,6 @@ export default function Dashboard() {
   const { user } = useSelector((state: RootState) => state.auth);
   const { unreadCount, notifications } = useSelector((state: RootState) => state.notifications);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  // const [showNotifications, setShowNotifications] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -72,63 +70,7 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-background">
       <div className="flex">
-        {/* Mobile Sidebar Toggle */}
-        <button
-          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-          className="lg:hidden fixed bottom-4 right-4 z-50 p-3 bg-primary text-primary-foreground rounded-full shadow-2xl hover:scale-105 transition-transform"
-        >
-          {isSidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </button>
-
-        {/* Sidebar Backdrop */}
-        {isSidebarOpen && (
-          <div
-            className="lg:hidden fixed inset-0 bg-background/80 backdrop-blur-sm z-40"
-            onClick={() => setIsSidebarOpen(false)}
-          />
-        )}
-
-        {/* Left Sidebar */}
-        <div className={`
-          fixed lg:relative inset-y-0 left-0 z-40
-          w-64 bg-card border-r min-h-screen transition-transform duration-300 transform
-          ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-        `}>
-          <div className="p-6">
-            <h2 className="text-lg font-semibold mb-6">Dashboard</h2>
-            <nav className="space-y-2">
-              <Link
-                href="/dashboard"
-                className="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary text-primary-foreground"
-                onClick={() => setIsSidebarOpen(false)}
-              >
-                <BookOpen className="h-5 w-5" />
-                My Courses
-              </Link>
-              <Link
-                href="/dashboard/quizzes"
-                className="flex items-center gap-3 px-3 py-2 rounded-lg text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
-                onClick={() => setIsSidebarOpen(false)}
-              >
-                <HelpCircle className="h-5 w-5" />
-                Quizzes
-              </Link>
-              <Link
-                href="/dashboard/notices"
-                className="flex items-center gap-3 px-3 py-2 rounded-lg text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
-                onClick={() => setIsSidebarOpen(false)}
-              >
-                <Megaphone className="h-5 w-5" />
-                Notice Board
-                {unreadCount > 0 && (
-                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground">
-                    {unreadCount}
-                  </span>
-                )}
-              </Link>
-            </nav>
-          </div>
-        </div>
+        <DashboardSidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
 
         {/* Main Content */}
         <div className="flex-1 overflow-x-hidden">
@@ -136,21 +78,23 @@ export default function Dashboard() {
             {/* Blurred Decorative Background Elements - Hidden on mobile */}
             <div className="hidden sm:block absolute top-20 -left-20 w-72 h-72 bg-primary/10 rounded-full blur-[100px] -z-0 pointer-events-none" />
             <div className="hidden sm:block absolute bottom-40 -right-20 w-96 h-96 bg-blue-500/10 rounded-full blur-[120px] -z-0 pointer-events-none" />
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-              <div>
-                <h1 className="text-2xl md:text-3xl font-bold mb-2">Welcome back, {user.name}!</h1>
-                <p className="text-muted-foreground">Continue your learning journey</p>
-              </div>
+
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-12">
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+              >
+                <h1 className="text-3xl md:text-5xl font-black mb-2 tracking-tighter gradient-text">Welcome back, {user.name}!</h1>
+                <p className="text-lg text-muted-foreground/80 font-medium">Continue your learning journey with passion.</p>
+              </motion.div>
             </div>
 
             {/* Stats Cards */}
-            {/* Stats Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8 relative z-10">
-              <Card className="group border-none shadow-premium overflow-hidden transition-all hover:translate-y-[-2px] bg-card/30 backdrop-blur-2xl border border-white/5">
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent pointer-events-none" />
+              <Card className="group glass-card border-none overflow-hidden transition-all hover:translate-y-[-2px]">
                 <CardContent className="p-6 relative z-10">
                   <div className="flex items-center gap-4">
-                    <BookOpen className="h-8 w-8 text-primary" />
+                    <BookOpen className="h-8 w-8 text-primary shadow-glow" />
                     <div>
                       <p className="text-2xl font-bold">{enrollments.length}</p>
                       <p className="text-sm text-muted-foreground">Enrolled Courses</p>
@@ -159,11 +103,10 @@ export default function Dashboard() {
                 </CardContent>
               </Card>
 
-              <Card className="group border-none shadow-premium overflow-hidden transition-all hover:translate-y-[-2px] bg-card/30 backdrop-blur-2xl border border-white/5">
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent pointer-events-none" />
+              <Card className="group glass-card border-none overflow-hidden transition-all hover:translate-y-[-2px]">
                 <CardContent className="p-6 relative z-10">
                   <div className="flex items-center gap-4">
-                    <TrendingUp className="h-8 w-8 text-green-600" />
+                    <TrendingUp className="h-8 w-8 text-green-400 shadow-glow" />
                     <div>
                       <p className="text-2xl font-bold">{inProgressCourses}</p>
                       <p className="text-sm text-muted-foreground">In Progress</p>
@@ -172,11 +115,10 @@ export default function Dashboard() {
                 </CardContent>
               </Card>
 
-              <Card className="group border-none shadow-premium overflow-hidden transition-all hover:translate-y-[-2px] bg-card/30 backdrop-blur-2xl border border-white/5">
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent pointer-events-none" />
+              <Card className="group glass-card border-none overflow-hidden transition-all hover:translate-y-[-2px]">
                 <CardContent className="p-6 relative z-10">
                   <div className="flex items-center gap-4">
-                    <Award className="h-8 w-8 text-yellow-600" />
+                    <Award className="h-8 w-8 text-yellow-500 shadow-glow" />
                     <div>
                       <p className="text-2xl font-bold">{completedCourses}</p>
                       <p className="text-sm text-muted-foreground">Completed</p>
@@ -185,11 +127,10 @@ export default function Dashboard() {
                 </CardContent>
               </Card>
 
-              <Card className="group border-none shadow-premium overflow-hidden transition-all hover:translate-y-[-2px] bg-card/30 backdrop-blur-2xl border border-white/5">
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent pointer-events-none" />
+              <Card className="group glass-card border-none overflow-hidden transition-all hover:translate-y-[-2px]">
                 <CardContent className="p-6 relative z-10">
                   <div className="flex items-center gap-4">
-                    <Clock className="h-8 w-8 text-blue-600" />
+                    <Clock className="h-8 w-8 text-blue-400 shadow-glow" />
                     <div>
                       <p className="text-2xl font-bold">{totalProgress.toFixed(0)}%</p>
                       <p className="text-sm text-muted-foreground">Avg Progress</p>
@@ -200,17 +141,16 @@ export default function Dashboard() {
             </div>
 
             {/* Enrolled Courses */}
-            <div className="mb-8">
-              <h2 className="text-2xl font-bold mb-6">My Courses</h2>
+            <div className="mb-8 relative z-10">
+              <h2 className="text-2xl font-bold mb-6 tracking-tight">My Courses</h2>
               {validEnrollments.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {validEnrollments.map((enrollment: Enrollment) => (
-                    <Card key={enrollment._id} className="group border-none shadow-premium overflow-hidden transition-all hover:translate-y-[-2px] bg-card/30 backdrop-blur-2xl border border-white/5 relative z-10">
-                      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent pointer-events-none" />
+                    <Card key={enrollment._id} className="group glass-card h-full flex flex-col hover:scale-[1.02] transition-all duration-500 border-white/5">
                       <div className="h-1.5 bg-gradient-to-r from-primary to-primary/40" />
                       <CardHeader className="relative z-10">
-                        <CardTitle className="line-clamp-2">{(enrollment.course as Course)?.title || 'Unknown Course'}</CardTitle>
-                        <CardDescription>
+                        <CardTitle className="line-clamp-2 text-xl font-bold">{(enrollment.course as Course)?.title || 'Unknown Course'}</CardTitle>
+                        <CardDescription className="text-muted-foreground/70">
                           {(() => {
                             const course = enrollment.course as Course;
                             const instructors = course?.instructors || [];
@@ -219,30 +159,30 @@ export default function Dashboard() {
                           })()}
                         </CardDescription>
                       </CardHeader>
-                      <CardContent className="relative z-10">
+                      <CardContent className="relative z-10 flex-grow">
                         <div className="space-y-4">
                           <div>
-                            <div className="flex justify-between text-sm mb-2">
-                              <span>Progress</span>
-                              <span>{enrollment.progress}%</span>
+                            <div className="flex justify-between text-xs font-bold mb-2 tracking-wider">
+                              <span>PROGRESS</span>
+                              <span className="text-primary">{enrollment.progress}%</span>
                             </div>
-                            <div className="w-full bg-secondary rounded-full h-2">
+                            <div className="w-full bg-white/5 rounded-full h-2 overflow-hidden border border-white/5">
                               <div
-                                className="bg-primary h-2 rounded-full transition-all duration-300"
+                                className="bg-primary h-2 rounded-full transition-all duration-500 shadow-glow shadow-primary/30"
                                 style={{ width: `${enrollment.progress}%` }}
                               ></div>
                             </div>
                           </div>
 
-                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <Clock className="h-4 w-4" />
-                            <span>Status: {enrollment.status}</span>
+                          <div className="flex items-center gap-2 text-xs font-bold text-muted-foreground/60 uppercase tracking-widest">
+                            <Clock className="h-3.5 w-3.5" />
+                            <span>{enrollment.status}</span>
                           </div>
                         </div>
                       </CardContent>
                       <div className="p-6 pt-0 relative z-10">
                         <Link href={(enrollment.course as Course) ? `/lesson/${(enrollment.course as Course)._id}` : '#'}>
-                          <Button className="w-full" disabled={!(enrollment.course as Course)}>
+                          <Button className="w-full h-11 rounded-xl shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all font-bold" disabled={!(enrollment.course as Course)}>
                             {enrollment.progress === 100 ? 'Review Course' : 'Continue Learning'}
                           </Button>
                         </Link>
@@ -251,14 +191,15 @@ export default function Dashboard() {
                   ))}
                 </div>
               ) : (
-                <Card className="border-none shadow-premium bg-card/30 backdrop-blur-2xl border border-white/5 relative z-10">
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent pointer-events-none" />
-                  <CardContent className="p-8 text-center relative z-10">
-                    <BookOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold mb-2">No courses yet</h3>
-                    <p className="text-muted-foreground mb-4">Start your learning journey by enrolling in a course.</p>
+                <Card className="glass-card border-none py-16 text-center">
+                  <CardContent className="relative z-10">
+                    <BookOpen className="h-16 w-16 text-primary mb-6 mx-auto shadow-glow" />
+                    <h3 className="text-2xl font-bold mb-3 tracking-tight">No courses yet</h3>
+                    <p className="text-muted-foreground max-w-sm mx-auto mb-8 text-lg">
+                      Start your learning journey by enrolling in a course.
+                    </p>
                     <Link href="/">
-                      <Button>Browse Courses</Button>
+                      <Button size="lg" className="px-10 rounded-xl shadow-xl shadow-primary/20">Browse Courses</Button>
                     </Link>
                   </CardContent>
                 </Card>

@@ -29,7 +29,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground bg-dot-pattern`}
       >
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <Providers>
@@ -37,21 +37,37 @@ export default function RootLayout({
             <main className="pt-16">
               {children}
             </main>
-            <Toaster 
-              position="top-right" 
+            <Toaster
+              position="top-right"
               toastOptions={{
-                duration: 4000,
+                duration: 5000,
                 style: {
+                  background: 'hsla(260, 30%, 5%, 0.8)',
+                  backdropFilter: 'blur(16px)',
+                  border: '1px solid hsla(270, 90%, 60%, 0.2)',
+                  color: '#fff',
+                  borderRadius: '1rem',
+                  padding: '16px 24px',
+                  boxShadow: '0 10px 30px -10px rgba(0,0,0,0.5)',
                   fontSize: '16px',
-                  padding: '16px 20px',
-                  minWidth: '300px',
+                  fontWeight: '500',
+                },
+                success: {
+                  iconTheme: {
+                    primary: 'hsla(270, 90%, 60%, 1)',
+                    secondary: '#fff',
+                  },
+                  style: {
+                    borderLeft: '4px solid hsla(270, 90%, 60%, 1)',
+                  },
                 },
                 error: {
+                  iconTheme: {
+                    primary: '#ef4444',
+                    secondary: '#fff',
+                  },
                   style: {
-                    fontSize: '16px',
-                    padding: '16px 20px',
-                    minWidth: '350px',
-                    fontWeight: '500',
+                    borderLeft: '4px solid #ef4444',
                   },
                 },
               }}

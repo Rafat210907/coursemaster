@@ -7,7 +7,6 @@ import { useState } from 'react';
 
 export function AdminSidebar() {
     const pathname = usePathname();
-
     const [isOpen, setIsOpen] = useState(false);
 
     const sidebarItems = [
@@ -40,12 +39,12 @@ export function AdminSidebar() {
             {/* Sidebar */}
             <div className={`
                 fixed lg:relative inset-y-0 left-0 z-40
-                w-64 bg-card border-r min-h-screen transition-transform duration-300 transform
-                ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+                w-64 bg-card/30 backdrop-blur-2xl border-r border-white/10 min-h-screen transition-all duration-500 transform
+                ${isOpen ? 'translate-x-0 shadow-[0_0_50px_rgba(0,0,0,0.5)]' : '-translate-x-full lg:translate-x-0'}
             `}>
-                <div className="p-6">
-                    <h2 className="text-lg font-semibold mb-6 text-primary">Admin Control</h2>
-                    <nav className="space-y-1">
+                <div className="p-4">
+                    <h2 className="text-xl font-black mb-6 gradient-text tracking-tighter">Admin Console</h2>
+                    <nav className="space-y-1.5">
                         {sidebarItems.map((item) => {
                             const isActive = pathname === item.href;
                             return (
@@ -53,15 +52,16 @@ export function AdminSidebar() {
                                     key={item.id}
                                     href={item.href}
                                     onClick={() => setIsOpen(false)}
+                                    className="block group"
                                 >
                                     <div
-                                        className={`flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 group ${isActive
-                                            ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20'
-                                            : 'hover:bg-accent text-muted-foreground hover:text-foreground'
+                                        className={`flex items-center space-x-3 px-3 py-2 rounded-xl transition-all duration-300 ${isActive
+                                            ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/30 neon-border'
+                                            : 'hover:bg-white/5 text-muted-foreground hover:text-foreground hover:translate-x-1'
                                             }`}
                                     >
-                                        <item.icon className={`h-5 w-5 ${isActive ? 'scale-110' : 'group-hover:scale-110'} transition-transform`} />
-                                        <span className="text-sm font-semibold">{item.label}</span>
+                                        <item.icon className={`h-5 w-5 ${isActive ? 'scale-110 shadow-glow' : 'group-hover:scale-110'} transition-transform duration-300`} />
+                                        <span className="text-xs font-bold tracking-wide uppercase tracking-widest">{item.label}</span>
                                     </div>
                                 </Link>
                             );

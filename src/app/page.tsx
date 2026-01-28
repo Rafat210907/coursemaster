@@ -10,9 +10,10 @@ import { motion } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
+import { CustomSelect } from '../components/ui/CustomSelect';
 import { Course } from '../types';
 import { RootState, AppDispatch } from './store/store';
-import { Search, Filter } from 'lucide-react';
+import { Search, Filter, BookOpen, Clock, Users, ArrowRight } from 'lucide-react';
 
 export default function Home() {
   const dispatch = useDispatch<AppDispatch>();
@@ -29,63 +30,71 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-background overflow-x-hidden">
-      <div className="max-w-full mx-auto px-3 sm:px-4 py-8 relative">
-        {/* Blurred Decorative Background Elements - Hidden on mobile to prevent overflow */}
-        <div className="hidden sm:block absolute top-20 -left-20 w-72 h-72 bg-primary/10 rounded-full blur-[100px] -z-0 pointer-events-none" />
-        <div className="hidden sm:block absolute bottom-40 -right-20 w-96 h-96 bg-blue-500/10 rounded-full blur-[120px] -z-0 pointer-events-none" />
+    <div className="min-h-screen bg-background overflow-x-hidden relative bg-dot-pattern">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 relative">
+        {/* Animated Decorative Background Elements */}
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/20 rounded-full blur-[120px] -z-0 pointer-events-none animate-pulse-slow" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-500/10 rounded-full blur-[120px] -z-0 pointer-events-none animate-float" />
         <div className="relative z-10 w-full">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-12"
+            className="text-center mb-16 relative"
           >
-            <h1 className="text-3xl md:text-5xl font-bold mb-4">Welcome to CourseMaster</h1>
-            <p className="text-lg md:text-xl text-muted-foreground mb-8">Discover and master new skills with our comprehensive courses</p>
+            <h1 className="text-4xl md:text-6xl font-extrabold mb-6 tracking-tight">
+              Welcome to <span className="gradient-text neon-glow">CourseMaster</span>
+            </h1>
+            <p className="text-lg md:text-2xl text-muted-foreground mb-8 max-w-2xl mx-auto leading-relaxed font-light">
+              Elevate your expertise with masterclasses from industry leaders. Discover, learn, and grow.
+            </p>
           </motion.div>
 
-          <div className="mb-8 flex flex-col sm:flex-row gap-4 items-center justify-center">
-            <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+          <div className="mb-12 flex flex-col sm:flex-row gap-6 items-center justify-center">
+            <div className="relative flex-1 max-w-lg group">
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground h-5 w-5 group-focus-within:text-primary transition-colors" />
               <Input
                 type="text"
-                placeholder="Search courses..."
+                placeholder="Search courses by title, instructor, or tags..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="pl-10"
+                className="pl-12 h-12 bg-white/5 border-white/10 rounded-2xl focus:border-primary/50 transition-all text-lg"
               />
             </div>
-            <div className="flex items-center gap-2">
-              <Filter className="h-4 w-4 text-muted-foreground" />
-              <select
+            <div className="flex items-center gap-3 glass px-1.5 rounded-2xl border-white/10 min-w-[280px]">
+              <div className="pl-3">
+                <Filter className="h-5 w-5 text-muted-foreground" />
+              </div>
+              <CustomSelect
                 value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                className="border border-input bg-background px-3 py-2 rounded-md text-sm"
-              >
-                <option value="">All Categories</option>
-                <option value="programming">Programming</option>
-                <option value="design">Design</option>
-                <option value="business">Business</option>
-                <option value="marketing">Marketing</option>
-                <option value="data-science">Data Science</option>
-                <option value="photography">Photography</option>
-              </select>
+                onChange={(val) => setCategory(val)}
+                options={[
+                  { value: '', label: 'All Categories' },
+                  { value: 'programming', label: 'Programming' },
+                  { value: 'design', label: 'Design' },
+                  { value: 'business', label: 'Business' },
+                  { value: 'marketing', label: 'Marketing' },
+                  { value: 'data-science', label: 'Data Science' },
+                  { value: 'photography', label: 'Photography' },
+                ]}
+                className="flex-1"
+                placeholder="Categories"
+              />
             </div>
           </div>
 
           {loading && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {Array.from({ length: 6 }).map((_, i) => (
-                <Card key={i}>
+                <Card key={i} className="glass-card h-[400px]">
                   <CardHeader>
-                    <Skeleton height={24} />
-                    <Skeleton height={16} />
+                    <Skeleton height={32} baseColor="#1f1f23" highlightColor="#2d2d33" />
+                    <Skeleton height={20} width="60%" baseColor="#1f1f23" highlightColor="#2d2d33" />
                   </CardHeader>
                   <CardContent>
-                    <Skeleton count={3} />
+                    <Skeleton count={4} baseColor="#1f1f23" highlightColor="#2d2d33" />
                   </CardContent>
-                  <CardFooter>
-                    <Skeleton height={36} width={100} />
+                  <CardFooter className="mt-auto">
+                    <Skeleton height={48} width="100%" baseColor="#1f1f23" highlightColor="#2d2d33" />
                   </CardFooter>
                 </Card>
               ))}
@@ -93,8 +102,10 @@ export default function Home() {
           )}
 
           {error && (
-            <div className="text-center py-8">
-              <p className="text-destructive">{error}</p>
+            <div className="text-center py-20 glass rounded-3xl border-red-500/20 max-w-xl mx-auto">
+              <p className="text-destructive text-xl font-semibold mb-4">Connection Issue</p>
+              <p className="text-muted-foreground mb-6">{error}</p>
+              <Button onClick={() => window.location.reload()} variant="outline">Try Again</Button>
             </div>
           )}
 
@@ -102,40 +113,82 @@ export default function Home() {
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
             >
               {courses.map((course: Course, index: number) => (
                 <motion.div
                   key={course._id}
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
+                  transition={{ delay: index * 0.1, duration: 0.5, ease: "easeOut" }}
                 >
-                  <Card className="h-full border-none shadow-premium bg-card/30 backdrop-blur-2xl border border-white/5 overflow-hidden group hover:translate-y-[-2px] transition-all duration-300">
-                    <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent pointer-events-none" />
-                    <CardHeader className="relative z-10">
-                      <CardTitle className="line-clamp-2">{course.title}</CardTitle>
-                      <CardDescription className="line-clamp-3">{course.description}</CardDescription>
+                  <Card className="glass-card h-full flex flex-col group hover:scale-[1.02] transition-all duration-500 rounded-3xl overflow-hidden border-white/5">
+                    <div className="absolute top-0 right-0 p-4 z-20">
+                      <span className="glass px-3 py-1 rounded-full text-xs font-semibold text-primary-foreground border-primary/20">
+                        {course.category}
+                      </span>
+                    </div>
+
+                    <CardHeader className="relative z-10 pt-8">
+                      <CardTitle className="text-2xl font-bold group-hover:text-primary transition-colors line-clamp-2 leading-tight">
+                        {course.title}
+                      </CardTitle>
+                      <CardDescription className="line-clamp-2 text-muted-foreground/80 mt-2">
+                        {course.description}
+                      </CardDescription>
                     </CardHeader>
-                    <CardContent className="relative z-10">
-                      <div className="space-y-2">
-                        <p className="text-sm text-muted-foreground">
-                          Instructors: {(course.instructors || []).map(inst => typeof inst === 'object' ? inst.name : 'Unknown').join(', ')}
-                        </p>
-                        <p className="text-sm text-muted-foreground">Duration: {course.duration} hours</p>
-                        <div className="flex flex-wrap gap-1">
+
+                    <CardContent className="relative z-10 flex-grow">
+                      <div className="space-y-4">
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-[10px] text-white font-bold">
+                            {(() => {
+                              const inst = course.instructors?.[0];
+                              return (typeof inst === 'object' && inst !== null ? inst.name : 'Unknown').charAt(0);
+                            })()}
+                          </div>
+                          <span className="line-clamp-1">
+                            {(course.instructors || []).map(inst => typeof inst === 'object' && inst !== null ? inst.name : 'Unknown').join(', ')}
+                          </span>
+                        </div>
+
+                        <div className="flex items-center gap-4 text-xs font-medium text-muted-foreground/60">
+                          <span className="flex items-center gap-1">
+                            <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+                            {course.lessons?.length || 0} Lessons
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+                            {course.duration} Hours
+                          </span>
+                        </div>
+
+                        <div className="flex flex-wrap gap-2 pt-2">
                           {course.tags.slice(0, 3).map((tag) => (
-                            <span key={tag} className="bg-secondary text-secondary-foreground px-2 py-1 rounded-md text-xs">
-                              {tag}
+                            <span key={tag} className="bg-white/5 border border-white/5 text-muted-foreground/90 px-3 py-1 rounded-full text-[10px] uppercase tracking-wider font-bold">
+                              #{tag}
                             </span>
                           ))}
                         </div>
                       </div>
                     </CardContent>
-                    <CardFooter className="flex justify-between items-center relative z-10">
-                      <span className="text-2xl font-bold">${course.price}</span>
+
+                    <CardFooter className="flex justify-between items-center relative z-10 p-6 pt-0 border-t border-white/5 mt-4">
+                      <div className="flex flex-col">
+                        <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold">Price</span>
+                        <span className="text-2xl font-black text-white">${course.price}</span>
+                      </div>
                       <Link href={`/course/${course._id}`}>
-                        <Button>View Details</Button>
+                        <Button className="rounded-2xl px-6 h-12 bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20 group transition-all">
+                          Enroll Now
+                          <motion.span
+                            className="inline-block ml-2"
+                            initial={{ x: 0 }}
+                            whileHover={{ x: 5 }}
+                          >
+                            →
+                          </motion.span>
+                        </Button>
                       </Link>
                     </CardFooter>
                   </Card>
@@ -143,6 +196,7 @@ export default function Home() {
               ))}
             </motion.div>
           )}
+
 
           {!loading && !error && totalPages > 1 && (
             <div className="mt-12 flex justify-center gap-2">

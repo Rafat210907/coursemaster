@@ -12,6 +12,7 @@ import { Course, Review } from '../../../types';
 import { Star, Clock, BookOpen, CheckCircle, MessageSquare } from 'lucide-react';
 import api from '../../../lib/axios';
 import TutorCard from '../../../components/TutorCard';
+import { CustomSelect } from '../../../components/ui/CustomSelect';
 
 export default function CourseDetails() {
   const { id } = useParams();
@@ -198,13 +199,18 @@ export default function CourseDetails() {
                     )}
                     <div className="mb-4">
                       <label className="block text-sm font-medium mb-2">Rating</label>
-                      <select
-                        value={newReview.rating}
-                        onChange={(e) => setNewReview({ ...newReview, rating: Number(e.target.value) })}
-                        className="border border-input bg-background px-3 py-2 rounded-md"
-                      >
-                        {[1, 2, 3, 4, 5].map(n => <option key={n} value={n}>{n} Stars</option>)}
-                      </select>
+                      <CustomSelect
+                        value={newReview.rating.toString()}
+                        onChange={(val) => setNewReview({ ...newReview, rating: Number(val) })}
+                        options={[
+                          { value: '1', label: '1 Star' },
+                          { value: '2', label: '2 Stars' },
+                          { value: '3', label: '3 Stars' },
+                          { value: '4', label: '4 Stars' },
+                          { value: '5', label: '5 Stars' }
+                        ]}
+                        className="w-full sm:w-64"
+                      />
                     </div>
                     <div className="mb-4">
                       <label className="block text-sm font-medium mb-2">Comment</label>

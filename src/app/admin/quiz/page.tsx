@@ -8,6 +8,7 @@ import { Plus, Trash2, Save, BookOpen, HelpCircle, CheckCircle, ChevronDown, Sea
 import toast from 'react-hot-toast';
 import { Course, Lesson } from '../../../types';
 import api from '../../../lib/axios';
+import { CustomSelect } from '../../../components/ui/CustomSelect';
 
 interface Question {
   question: string;
@@ -171,17 +172,15 @@ export default function QuizBuilder() {
                         <BookOpen className="h-4 w-4" />
                         Select Course *
                       </label>
-                      <select
+                      <CustomSelect
                         value={selectedCourseId}
-                        onChange={(e) => setSelectedCourseId(e.target.value)}
-                        className="w-full p-2 border border-input rounded-md bg-background/50"
-                        required
-                      >
-                        <option value="">Choose a course</option>
-                        {courses.map(course => (
-                          <option key={course._id} value={course._id}>{course.title}</option>
-                        ))}
-                      </select>
+                        onChange={(val) => setSelectedCourseId(val)}
+                        options={[
+                          { value: '', label: 'Choose a course' },
+                          ...courses.map(course => ({ value: course._id, label: course.title }))
+                        ]}
+                        className="w-full"
+                      />
                     </div>
                   </div>
 
@@ -239,14 +238,15 @@ export default function QuizBuilder() {
                             </div>
                             <div className="space-y-2">
                               <label className="text-sm font-medium text-foreground/80">Type</label>
-                              <select
+                              <CustomSelect
                                 value={question.type}
-                                onChange={(e) => updateQuestion(index, 'type', e.target.value)}
-                                className="w-full p-2 border border-input rounded-md bg-background/50"
-                              >
-                                <option value="single">Single Choice</option>
-                                <option value="multiple">Multiple Choice</option>
-                              </select>
+                                onChange={(val) => updateQuestion(index, 'type', val)}
+                                options={[
+                                  { value: 'single', label: 'Single Choice' },
+                                  { value: 'multiple', label: 'Multiple Choice' }
+                                ]}
+                                className="w-full"
+                              />
                             </div>
                           </div>
 

@@ -67,12 +67,14 @@ export default function Header() {
   };
 
   return (
-    <header className={`fixed top-0 left-0 right-0 z-50 border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 transition-transform duration-300 ${isVisible ? 'translate-y-0' : '-translate-y-full'
+    <header className={`fixed top-0 left-0 right-0 z-50 glass border-b border-white/10 transition-transform duration-300 ${isVisible ? 'translate-y-0' : '-translate-y-full'
       }`}>
-      <div className="max-w-full mx-auto flex h-16 items-center px-2 sm:px-4 gap-1">
-        <Link href="/" className="flex items-center space-x-1 sm:space-x-2 shrink-0">
-          <BookOpen className="h-5 w-5 sm:h-7 sm:w-7" />
-          <span className="text-lg sm:text-2xl font-bold whitespace-nowrap">CourseMaster</span>
+      <div className="max-w-7xl mx-auto flex h-14 items-center px-4 sm:px-6 gap-2">
+        <Link href="/" className="flex items-center space-x-3 shrink-0 group">
+          <div className="bg-primary/20 p-1.5 rounded-lg group-hover:bg-primary/30 transition-colors">
+            <BookOpen className="h-5 w-5 sm:h-6 sm:w-6 text-primary neon-glow" />
+          </div>
+          <span className="text-xl sm:text-2xl font-black whitespace-nowrap gradient-text">CourseMaster</span>
         </Link>
 
         {/* Desktop Navigation */}
@@ -113,7 +115,7 @@ export default function Header() {
                         initial={{ opacity: 0, scale: 0.95, y: -10 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                        className="absolute right-0 top-full mt-2 w-80 sm:w-96 z-50 bg-card/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl overflow-hidden"
+                        className="absolute right-0 top-full mt-2 w-80 sm:w-96 z-50 glass-card overflow-hidden"
                       >
                         <div className="flex items-center justify-between p-4 border-b border-white/5">
                           <h3 className="font-semibold">Notifications</h3>
@@ -186,8 +188,8 @@ export default function Header() {
                 <span>Profile</span>
               </Link>
 
-              <Button variant="outline" size="sm" onClick={handleLogout} className="h-9">
-                <LogOut className="h-4 w-4 mr-2" />
+              <Button variant="outline" size="sm" onClick={handleLogout} className="h-8 py-0">
+                <LogOut className="h-3.5 w-3.5 mr-1.5" />
                 Logout
               </Button>
             </>

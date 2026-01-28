@@ -6,17 +6,18 @@ import { RootState, AppDispatch } from '../../store/store';
 import { fetchEnrolledCourses } from '../../store/slices/enrollmentSlice';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../../components/ui/Card';
 import { Button } from '../../../components/ui/Button';
-import { BookOpen, HelpCircle, Trophy, PlayCircle, Menu, X, Megaphone } from 'lucide-react';
+import { HelpCircle, Trophy, PlayCircle, Clock } from 'lucide-react';
 import { fetchNotifications } from '../../store/slices/notificationSlice';
 import api from '../../../lib/axios';
 import { Quiz, Course } from '../../../types';
 import Link from 'next/link';
+import { DashboardSidebar } from '../../../components/DashboardSidebar';
+import { motion } from 'framer-motion';
 
 export default function DashboardQuizzes() {
   const dispatch = useDispatch<AppDispatch>();
   const { user } = useSelector((state: RootState) => state.auth);
   const { enrollments, loading: enrollmentsLoading } = useSelector((state: RootState) => state.enrollments);
-  const { unreadCount } = useSelector((state: RootState) => state.notifications);
   const [quizzes, setQuizzes] = useState<{ quiz: Quiz, courseTitle: string }[]>([]);
   const [loading, setLoading] = useState(true);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -55,7 +56,6 @@ export default function DashboardQuizzes() {
         const results = await Promise.all(quizPromises);
         const allQuizzes = results.flat();
 
-        // Use a map to handle duplicates just in case
         const uniqueQuizzesMap = new Map();
         allQuizzes.forEach(item => {
           if (!uniqueQuizzesMap.has(item.quiz._id)) {
@@ -93,65 +93,9 @@ export default function DashboardQuizzes() {
   }
 
   return (
-    <div className="min-h-screen bg-background overflow-x-hidden">
+    <div className="min-h-screen bg-background">
       <div className="flex">
-        {/* Mobile Sidebar Toggle */}
-        <button
-          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-          className="lg:hidden fixed bottom-4 right-4 z-50 p-3 bg-primary text-primary-foreground rounded-full shadow-2xl hover:scale-105 transition-transform"
-        >
-          {isSidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </button>
-
-        {/* Sidebar Backdrop */}
-        {isSidebarOpen && (
-          <div
-            className="lg:hidden fixed inset-0 bg-background/80 backdrop-blur-sm z-40"
-            onClick={() => setIsSidebarOpen(false)}
-          />
-        )}
-
-        {/* Left Sidebar */}
-        <div className={`
-          fixed lg:relative inset-y-0 left-0 z-40
-          w-64 bg-card border-r min-h-screen transition-transform duration-300 transform
-          ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-        `}>
-          <div className="p-6">
-            <h2 className="text-lg font-semibold mb-6">CourseMaster</h2>
-            <nav className="space-y-2">
-              <Link
-                href="/dashboard"
-                className="flex items-center gap-3 px-3 py-2 rounded-lg text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
-                onClick={() => setIsSidebarOpen(false)}
-              >
-                <BookOpen className="h-5 w-5" />
-                My Courses
-              </Link>
-              <Link
-                href="/dashboard/quizzes"
-                className="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary text-primary-foreground shadow-sm"
-                onClick={() => setIsSidebarOpen(false)}
-              >
-                <HelpCircle className="h-5 w-5" />
-                Quizzes
-              </Link>
-              <Link
-                href="/dashboard/notices"
-                className="flex items-center gap-3 px-3 py-2 rounded-lg text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
-                onClick={() => setIsSidebarOpen(false)}
-              >
-                <Megaphone className="h-5 w-5" />
-                Notice Board
-                {unreadCount > 0 && (
-                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground">
-                    {unreadCount}
-                  </span>
-                )}
-              </Link>
-            </nav>
-          </div>
-        </div>
+        <DashboardSidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
 
         {/* Main Content */}
         <div className="flex-1 relative overflow-x-hidden">
@@ -159,18 +103,18 @@ export default function DashboardQuizzes() {
           <div className="hidden sm:block absolute top-20 -left-20 w-72 h-72 bg-primary/10 rounded-full blur-[100px] -z-0 pointer-events-none" />
           <div className="hidden sm:block absolute bottom-40 -right-20 w-96 h-96 bg-blue-500/10 rounded-full blur-[120px] -z-0 pointer-events-none" />
 
-          <div className="max-w-full mx-auto px-3 sm:px-4 md:px-6 py-8 relative z-10">
-            <div className="mb-8 text-center md:text-left">
-              <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-2">My Quizzes</h1>
-              <p className="text-lg md:text-xl text-muted-foreground">Challenge yourself and master your subjects</p>
+          <div className="max-w-full mx-auto px-3 sm:px-4 md:px-8 py-8 relative z-10">
+            <div className="mb-12 text-center md:text-left">
+              <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
+                <h1 className="text-3xl md:text-5xl font-black mb-2 tracking-tighter gradient-text">My Quizzes</h1>
+                <p className="text-lg text-muted-foreground/80 font-medium">Challenge yourself and master your subjects</p>
+              </motion.div>
             </div>
 
             {loading ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {[1, 2, 3].map((i) => (
-                  <Card key={i} className="animate-pulse border-none shadow-md overflow-hidden bg-card/30 backdrop-blur-md">
-                    <div className="h-32 bg-muted/50" />
-                    <CardContent className="h-24 p-6" />
+                  <Card key={i} className="animate-pulse glass-card h-64 border-none shadow-premium overflow-hidden">
                   </Card>
                 ))}
               </div>
@@ -182,17 +126,16 @@ export default function DashboardQuizzes() {
                   );
 
                   return (
-                    <Card key={quiz._id} className="group hover:shadow-premium transition-all duration-300 border-none shadow-md overflow-hidden bg-card/30 backdrop-blur-2xl border border-white/5 relative">
-                      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent pointer-events-none" />
+                    <Card key={quiz._id} className="group glass-card h-full flex flex-col hover:scale-[1.02] transition-all duration-500 border-white/5 relative">
                       <div className="h-1.5 bg-gradient-to-r from-primary to-primary/40" />
                       <CardHeader className="pb-4 relative z-10">
                         <div className="flex justify-between items-start mb-4">
-                          <span className="text-xs font-bold uppercase tracking-wider px-3 py-1 bg-primary/10 text-primary rounded-full">
+                          <span className="text-[10px] font-black uppercase tracking-widest px-3 py-1 bg-primary/10 text-primary rounded-full border border-primary/20">
                             {courseTitle}
                           </span>
                           {submission && (
-                            <div className="flex items-center gap-1.5 px-3 py-1 bg-green-500/10 text-green-600 rounded-full border border-green-500/20">
-                              <Trophy size={14} className="fill-green-600/20" />
+                            <div className="flex items-center gap-1.5 px-3 py-1 bg-green-500/10 text-green-400 rounded-full border border-green-500/20 shadow-glow shadow-green-500/20">
+                              <Trophy size={14} className="fill-green-400/20" />
                               <span className="text-xs font-bold">
                                 {Math.round((submission.score / quiz.questions.length) * 100)}%
                               </span>
@@ -202,27 +145,33 @@ export default function DashboardQuizzes() {
                         <CardTitle className="text-2xl font-bold leading-tight group-hover:text-primary transition-colors">
                           {quiz.title}
                         </CardTitle>
-                        <CardDescription className="text-sm">
+                        <CardDescription className="text-sm font-medium text-muted-foreground/70 flex items-center gap-2 mt-2">
+                          <HelpCircle className="h-4 w-4" />
                           {quiz.questions.length} Questions • Estimated 10 mins
                         </CardDescription>
                       </CardHeader>
-                      <CardContent className="pt-0 relative z-10">
+                      <CardContent className="pt-0 relative z-10 flex-grow">
+                        <div className="p-4 rounded-xl bg-white/5 border border-white/5 mb-4 group-hover:border-primary/20 transition-colors">
+                          <p className="text-xs text-muted-foreground font-bold tracking-widest uppercase mb-1">Last Score</p>
+                          <p className="text-lg font-black">{submission ? `${submission.score}/${quiz.questions.length}` : 'Not Started'}</p>
+                        </div>
+                      </CardContent>
+                      <div className="p-6 pt-0 relative z-10">
                         <Link href={`/lesson/${quiz.course || '#'}`}>
-                          <Button className="w-full group-hover:scale-[1.02] transition-transform shadow-lg shadow-primary/20">
+                          <Button className="w-full h-11 rounded-xl shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all font-bold">
                             <PlayCircle className="h-4 w-4 mr-2" />
                             {submission ? 'Retake Quiz' : 'Start Assessment'}
                           </Button>
                         </Link>
-                      </CardContent>
+                      </div>
                     </Card>
                   );
                 })}
               </div>
             ) : (
-              <Card className="text-center py-20 border-none border-muted bg-card/30 backdrop-blur-sm shadow-inner relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent pointer-events-none" />
+              <Card className="glass-card border-none py-20 text-center">
                 <CardContent className="relative z-10">
-                  <div className="bg-primary/10 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse">
+                  <div className="bg-primary/10 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 shadow-glow shadow-primary/20">
                     <HelpCircle className="h-12 w-12 text-primary" />
                   </div>
                   <h3 className="text-2xl font-bold mb-3 tracking-tight">No quizzes found</h3>
@@ -230,7 +179,7 @@ export default function DashboardQuizzes() {
                     Once you enroll in courses that have assessments, they will appear here.
                   </p>
                   <Link href="/dashboard">
-                    <Button size="lg" className="px-8 shadow-xl shadow-primary/20">Explore My Courses</Button>
+                    <Button size="lg" className="px-10 rounded-xl shadow-xl shadow-primary/20">Explore My Courses</Button>
                   </Link>
                 </CardContent>
               </Card>
