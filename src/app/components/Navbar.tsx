@@ -26,8 +26,8 @@ export default function Navbar() {
             </>
           ) : (
             <>
-              <Link href="/login">Login</Link>
-              <Link href="/register">Register</Link>
+              <Link href="/login" prefetch={false}>Login</Link>
+              <Link href="/register" prefetch={false}>Register</Link>
             </>
           )}
         </div>

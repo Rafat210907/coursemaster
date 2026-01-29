@@ -99,7 +99,7 @@ export default function Login() {
 
           <div className="mt-6 text-center text-sm">
             <span className="text-muted-foreground">Don&apos;t have an account? </span>
-            <Link href="/register" className="text-primary hover:underline">
+            <Link href="/register" className="text-primary hover:underline" prefetch={false}>
               Sign up
             </Link>
           </div>

@@ -154,7 +154,7 @@ export default function Register() {
 
           <div className="mt-6 text-center text-sm">
             <span className="text-muted-foreground">Already have an account? </span>
-            <Link href="/login" className="text-primary hover:underline">
+            <Link href="/login" className="text-primary hover:underline" prefetch={false}>
               Sign in
             </Link>
           </div>

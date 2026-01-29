@@ -70,7 +70,7 @@ export default function Header() {
     <header className={`fixed top-0 left-0 right-0 z-50 glass border-b border-white/10 transition-transform duration-300 ${isVisible ? 'translate-y-0' : '-translate-y-full'
       }`}>
       <div className="max-w-7xl mx-auto flex h-14 items-center px-4 sm:px-6 gap-2">
-        <Link href="/" className="flex items-center space-x-3 shrink-0 group">
+        <Link href="/" className="flex items-center space-x-3 shrink-0 group" prefetch={false}>
           <div className="bg-primary/20 p-1.5 rounded-lg group-hover:bg-primary/30 transition-colors">
             <BookOpen className="h-5 w-5 sm:h-6 sm:w-6 text-primary neon-glow" />
           </div>
@@ -79,14 +79,14 @@ export default function Header() {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-4 ml-auto">
-          <Link href="/" className="flex items-center space-x-1.5 text-base font-medium hover:text-primary transition-colors">
+          <Link href="/" className="flex items-center space-x-1.5 text-base font-medium hover:text-primary transition-colors" prefetch={false}>
             <Home className="h-5 w-5" />
             <span>Home</span>
           </Link>
 
           {user ? (
             <>
-              <Link href="/dashboard" className="flex items-center space-x-1.5 text-base font-medium hover:text-primary transition-colors">
+              <Link href="/dashboard" className="flex items-center space-x-1.5 text-base font-medium hover:text-primary transition-colors" prefetch={false}>
                 <BarChart3 className="h-5 w-5" />
                 <span>Dashboard</span>
               </Link>
@@ -130,6 +130,7 @@ export default function Header() {
                               href="/dashboard/notices"
                               className="text-xs text-muted-foreground hover:text-foreground transition-colors"
                               onClick={() => setShowNotifications(false)}
+                              prefetch={false}
                             >
                               View All
                             </Link>
@@ -197,12 +198,12 @@ export default function Header() {
               </button>
 
               {user.role === 'admin' && (
-                <Link href="/admin" className="text-base font-medium hover:text-primary transition-colors">
+                <Link href="/admin" className="text-base font-medium hover:text-primary transition-colors" prefetch={false}>
                   Admin
                 </Link>
               )}
 
-              <Link href="/profile" className="flex items-center space-x-1.5 text-base font-medium hover:text-primary transition-colors">
+              <Link href="/profile" className="flex items-center space-x-1.5 text-base font-medium hover:text-primary transition-colors" prefetch={false}>
                 <User className="h-5 w-5" />
                 <span>Profile</span>
               </Link>
@@ -227,7 +228,7 @@ export default function Header() {
         {/* Mobile Menu Button and Unified Actions */}
         <div className="flex md:hidden items-center gap-0.5 sm:gap-1 ml-auto shrink-0">
           {user && (
-            <Link href="/dashboard/notices" className="relative p-2 hover:bg-accent rounded-md transition-colors">
+            <Link href="/dashboard/notices" className="relative p-2 hover:bg-accent rounded-md transition-colors" prefetch={false}>
               <Bell className="h-5 w-5" />
               {unreadCount > 0 && (
                 <span className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-xs rounded-full px-1.5 min-w-5 h-5 flex items-center justify-center font-medium">
@@ -263,6 +264,7 @@ export default function Header() {
               href="/"
               onClick={() => setIsMenuOpen(false)}
               className="flex items-center space-x-2 p-2 rounded-md hover:bg-accent transition-colors"
+              prefetch={false}
             >
               <Home className="h-5 w-5" />
               <span className="font-medium">Home</span>
@@ -274,6 +276,7 @@ export default function Header() {
                   href="/dashboard"
                   onClick={() => setIsMenuOpen(false)}
                   className="flex items-center space-x-2 p-2 rounded-md hover:bg-accent transition-colors"
+                  prefetch={false}
                 >
                   <BarChart3 className="h-5 w-5" />
                   <span className="font-medium">Dashboard</span>
@@ -284,6 +287,7 @@ export default function Header() {
                     href="/admin"
                     onClick={() => setIsMenuOpen(false)}
                     className="flex items-center space-x-2 p-2 rounded-md hover:bg-accent transition-colors"
+                    prefetch={false}
                   >
                     <BookOpen className="h-5 w-5 text-primary" />
                     <span className="font-medium">Admin Dashboard</span>
@@ -294,6 +298,7 @@ export default function Header() {
                   href="/profile"
                   onClick={() => setIsMenuOpen(false)}
                   className="flex items-center space-x-2 p-2 rounded-md hover:bg-accent transition-colors"
+                  prefetch={false}
                 >
                   <User className="h-5 w-5" />
                   <span className="font-medium">Profile</span>
