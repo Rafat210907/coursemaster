@@ -13,7 +13,7 @@ import { Input } from '../components/ui/Input';
 import { CustomSelect } from '../components/ui/CustomSelect';
 import { Course } from '../types';
 import { RootState, AppDispatch } from './store/store';
-import { Search, Filter, BookOpen, Clock, Users, ArrowRight } from 'lucide-react';
+import { Search, Filter } from 'lucide-react';
 
 export default function Home() {
   const dispatch = useDispatch<AppDispatch>();

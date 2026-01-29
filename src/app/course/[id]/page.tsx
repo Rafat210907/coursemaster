@@ -308,7 +308,7 @@ export default function CourseDetails() {
 
             {/* Instructor cards */}
             <div className="space-y-4">
-              {(course.instructors || []).map((instructor, index) => (
+              {(course.instructors || []).map((instructor) => (
                 typeof instructor === 'object' && (
                   <TutorCard
                     key={instructor._id}

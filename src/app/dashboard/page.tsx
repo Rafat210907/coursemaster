@@ -8,24 +8,19 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../..
 import { Button } from '../../components/ui/Button';
 import { RootState, AppDispatch } from '../store/store';
 import { Enrollment, Course } from '../../types';
-import { BookOpen, TrendingUp, Clock, Award, HelpCircle, Megaphone, Bell, ChevronRight } from 'lucide-react';
-import { fetchNotifications } from '../store/slices/notificationSlice';
-import { AnimatePresence, motion } from 'framer-motion';
-import { format } from 'date-fns';
-import { markRead, markReadByNoticeId } from '../store/slices/notificationSlice';
+import { BookOpen, TrendingUp, Clock, Award } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { DashboardSidebar } from '../../components/DashboardSidebar';
 
 export default function Dashboard() {
   const dispatch = useDispatch<AppDispatch>();
   const { enrollments, loading } = useSelector((state: RootState) => state.enrollments);
   const { user } = useSelector((state: RootState) => state.auth);
-  const { unreadCount, notifications } = useSelector((state: RootState) => state.notifications);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (user) {
       dispatch(fetchEnrolledCourses());
-      dispatch(fetchNotifications());
     }
   }, [dispatch, user]);
 

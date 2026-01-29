@@ -356,7 +356,7 @@ export default function AdminNotices() {
                                                         <span className="text-sm font-bold truncate">
                                                             {notice.targetType === 'all'
                                                                 ? 'All Students'
-                                                                : `${(notice.targetCourses as any[])?.length || 0} Courses Targeted`}
+                                                                : `${Array.isArray(notice.targetCourses) ? notice.targetCourses.length : 0} Courses Targeted`}
                                                         </span>
                                                     </div>
                                                     <button
@@ -452,7 +452,7 @@ export default function AdminNotices() {
     );
 }
 
-function CheckCircle(props: any) {
+function CheckCircle(props: React.SVGProps<SVGSVGElement>) {
     return (
         <svg
             {...props}

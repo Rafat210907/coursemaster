@@ -74,11 +74,12 @@ export interface Quiz {
     correctAnswers: number[];
   }[];
   submissions: {
-    student: string | any;
+    student: string | User;
     answers: (number | number[])[];
     score: number;
     submittedAt: string;
   }[];
+  createdAt: string;
 }
 
 export interface Assignment {
@@ -139,7 +140,7 @@ export interface Notification {
   _id: string;
   recipient: string;
   message: string;
-  type: 'notice' | 'assignment' | 'grade' | 'system';
+  type: 'notice' | 'assignment' | 'grade' | 'system' | 'course' | 'quiz';
   referenceId?: string;
   isRead: boolean;
   createdAt: string;
@@ -155,4 +156,11 @@ export interface Analytics {
   coursePopularity?: { title: string; count: number }[];
   topSearchedCourses?: { title: string; searchCount: number }[];
   topQuizCompleters?: { name: string; completedQuizzes: number }[];
+}
+
+export interface QuizRanking {
+  _id: string;
+  name: string;
+  profileImage?: string;
+  completedQuizzes: number;
 }

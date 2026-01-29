@@ -22,8 +22,9 @@ export const fetchNotifications = createAsyncThunk(
         try {
             const response = await api.get('/notices/notifications');
             return response.data;
-        } catch (error: any) {
-            return rejectWithValue(error.response?.data?.message || 'Failed to fetch notifications');
+        } catch (error: unknown) {
+            const err = error as { response?: { data?: { message?: string } } };
+            return rejectWithValue(err.response?.data?.message || 'Failed to fetch notifications');
         }
     }
 );
@@ -34,8 +35,9 @@ export const markRead = createAsyncThunk(
         try {
             const response = await api.put(`/notices/notifications/${id}/read`);
             return response.data;
-        } catch (error: any) {
-            return rejectWithValue(error.response?.data?.message || 'Failed to mark notification as read');
+        } catch (error: unknown) {
+            const err = error as { response?: { data?: { message?: string } } };
+            return rejectWithValue(err.response?.data?.message || 'Failed to mark notification as read');
         }
     }
 );
@@ -46,8 +48,22 @@ export const markReadByNoticeId = createAsyncThunk(
         try {
             await api.put(`/notices/notifications/reference/${noticeId}/read`);
             return noticeId;
-        } catch (error: any) {
-            return rejectWithValue(error.response?.data?.message || 'Failed to mark notifications as read');
+        } catch (error: unknown) {
+            const err = error as { response?: { data?: { message?: string } } };
+            return rejectWithValue(err.response?.data?.message || 'Failed to mark notifications as read');
+        }
+    }
+);
+
+export const markAllNotificationsRead = createAsyncThunk(
+    'notifications/markAllRead',
+    async (_, { rejectWithValue }) => {
+        try {
+            await api.put('/notices/notifications/mark-all-read');
+            return true;
+        } catch (error: unknown) {
+            const err = error as { response?: { data?: { message?: string } } };
+            return rejectWithValue(err.response?.data?.message || 'Failed to mark all notifications as read');
         }
     }
 );
@@ -87,6 +103,10 @@ const notificationSlice = createSlice({
                     n.referenceId === action.payload ? { ...n, isRead: true } : n
                 );
                 state.unreadCount = state.notifications.filter(n => !n.isRead).length;
+            })
+            .addCase(markAllNotificationsRead.fulfilled, (state) => {
+                state.notifications = state.notifications.map(n => ({ ...n, isRead: true }));
+                state.unreadCount = 0;
             });
     },
 });

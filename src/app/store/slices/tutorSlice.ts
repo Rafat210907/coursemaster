@@ -37,8 +37,9 @@ export const createTutor = createAsyncThunk('tutors/createTutor', async (tutorDa
   try {
     const response = await api.post('/tutors', tutorData);
     return response.data;
-  } catch (err: any) {
-    return rejectWithValue(err.response?.data?.error || err.response?.data?.message || 'Failed to create tutor');
+  } catch (err: unknown) {
+    const error = err as { response?: { data?: { error?: string; message?: string } } };
+    return rejectWithValue(error.response?.data?.error || error.response?.data?.message || 'Failed to create tutor');
   }
 });
 
@@ -46,8 +47,9 @@ export const updateTutor = createAsyncThunk('tutors/updateTutor', async ({ id, t
   try {
     const response = await api.put(`/tutors/${id}`, tutorData);
     return response.data;
-  } catch (err: any) {
-    return rejectWithValue(err.response?.data?.error || err.response?.data?.message || 'Failed to update tutor');
+  } catch (err: unknown) {
+    const error = err as { response?: { data?: { error?: string; message?: string } } };
+    return rejectWithValue(error.response?.data?.error || error.response?.data?.message || 'Failed to update tutor');
   }
 });
 
@@ -55,8 +57,9 @@ export const deleteTutor = createAsyncThunk('tutors/deleteTutor', async (id: str
   try {
     await api.delete(`/tutors/${id}`);
     return id;
-  } catch (err: any) {
-    return rejectWithValue(err.response?.data?.error || err.response?.data?.message || 'Failed to delete tutor');
+  } catch (err: unknown) {
+    const error = err as { response?: { data?: { error?: string; message?: string } } };
+    return rejectWithValue(error.response?.data?.error || error.response?.data?.message || 'Failed to delete tutor');
   }
 });
 

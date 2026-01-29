@@ -8,7 +8,7 @@ import { Button } from './ui/Button';
 import { User, LogOut, Home, BarChart3, BookOpen, Bell, Moon, Sun, Menu, X } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { RootState, AppDispatch } from '../app/store/store';
-import { fetchNotifications, markRead } from '../app/store/slices/notificationSlice';
+import { fetchNotifications, markRead, markAllNotificationsRead } from '../app/store/slices/notificationSlice';
 import { AnimatePresence, motion } from 'framer-motion';
 import { format } from 'date-fns';
 import { useRouter } from 'next/navigation';
@@ -119,13 +119,21 @@ export default function Header() {
                       >
                         <div className="flex items-center justify-between p-4 border-b border-white/5">
                           <h3 className="font-semibold">Notifications</h3>
-                          <Link
-                            href="/dashboard/notices"
-                            className="text-xs text-primary hover:underline"
-                            onClick={() => setShowNotifications(false)}
-                          >
-                            View All
-                          </Link>
+                          <div className="flex items-center gap-3">
+                            <button
+                              onClick={() => dispatch(markAllNotificationsRead())}
+                              className="text-xs text-primary hover:underline"
+                            >
+                              Mark all as read
+                            </button>
+                            <Link
+                              href="/dashboard/notices"
+                              className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                              onClick={() => setShowNotifications(false)}
+                            >
+                              View All
+                            </Link>
+                          </div>
                         </div>
 
                         <div className="max-h-[60vh] overflow-y-auto">
@@ -136,23 +144,34 @@ export default function Header() {
                             </div>
                           ) : (
                             <div className="divide-y divide-white/5">
-                              {notifications.slice(0, 5).map((notif) => (
+                              {notifications.slice(0, 10).map((notif) => (
                                 <div
                                   key={notif._id}
-                                  onClick={() => {
+                                  onClick={async () => {
                                     dispatch(markRead(notif._id));
                                     setShowNotifications(false);
-                                    router.push('/dashboard/notices');
+
+                                    if (notif.type === 'course') {
+                                      router.push(`/course/${notif.referenceId}`);
+                                    } else if (notif.type === 'quiz') {
+                                      // We need courseId for quizzes, but for now we redirect to notices or handle it
+                                      // Ideally we'd fetch the quiz to get courseId, or encode it.
+                                      // Let's assume the user will handle the exact landing.
+                                      // Fixed route logic should be here.
+                                      router.push(`/dashboard/notices`);
+                                    } else {
+                                      router.push('/dashboard/notices');
+                                    }
                                   }}
-                                  className={`p-4 hover:bg-accent/50 transition-colors cursor-pointer ${!notif.isRead ? 'bg-primary/5' : ''}`}
+                                  className={`p-4 hover:bg-white/5 transition-all cursor-pointer relative ${!notif.isRead ? 'bg-primary/5' : ''}`}
                                 >
                                   <div className="flex gap-3">
-                                    <div className={`mt-1 h-2 w-2 rounded-full shrink-0 ${!notif.isRead ? 'bg-primary' : 'bg-transparent'}`} />
+                                    <div className={`mt-1 h-2 w-2 rounded-full shrink-0 ${!notif.isRead ? 'bg-primary shadow-[0_0_10px_rgba(139,92,246,0.6)]' : 'bg-transparent'}`} />
                                     <div className="flex-1 space-y-1">
-                                      <p className={`text-sm leading-snug ${!notif.isRead ? 'font-medium text-foreground' : 'text-muted-foreground'}`}>
+                                      <p className={`text-sm leading-snug ${!notif.isRead ? 'font-bold text-foreground' : 'text-muted-foreground'}`}>
                                         {notif.message}
                                       </p>
-                                      <p className="text-xs text-muted-foreground/60">
+                                      <p className="text-xs text-muted-foreground/40">
                                         {format(new Date(notif.createdAt), 'MMM d, h:mm a')}
                                       </p>
                                     </div>

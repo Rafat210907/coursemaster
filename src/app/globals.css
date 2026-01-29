@@ -89,8 +89,21 @@
       radial-gradient(circle at 0% 0%, hsla(265, 85%, 60%, 0.12) 0%, transparent 45%),
       radial-gradient(circle at 100% 100%, hsla(220, 85%, 60%, 0.08) 0%, transparent 45%),
       radial-gradient(circle at 50% 50%, hsla(265, 40%, 15%, 0.15) 0%, transparent 50%);
-    background-attachment: fixed;
     @apply antialiased selection:bg-primary/30;
+    overflow-x: hidden;
+  }
+
+  /* Fix for mobile scrolling issues and double scrollbars */
+  @media (max-width: 768px) {
+    body {
+      background-attachment: scroll;
+      overflow-y: visible;
+    }
+  }
+
+  html {
+    overflow-y: auto;
+    overflow-x: hidden;
   }
 
   select {
@@ -228,6 +241,12 @@
 .bg-dot-pattern {
   background-image: radial-gradient(hsla(270, 90%, 60%, 0.1) 1px, transparent 1px);
   background-size: 30px 30px;
+}
+
+@media (max-width: 768px) {
+  .bg-dot-pattern {
+    background-attachment: scroll !important;
+  }
 }
 
 .select-scrollbar::-webkit-scrollbar {

@@ -23,8 +23,9 @@ export const register = createAsyncThunk(
     try {
       const response = await api.post('/auth/register', { name, email, password });
       return response.data;
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || 'Registration failed');
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      return rejectWithValue(err.response?.data?.message || 'Registration failed');
     }
   }
 );
@@ -35,8 +36,9 @@ export const login = createAsyncThunk(
     try {
       const response = await api.post('/auth/login', { email, password });
       return response.data;
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || 'Login failed');
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      return rejectWithValue(err.response?.data?.message || 'Login failed');
     }
   }
 );

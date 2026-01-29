@@ -1,12 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../../components/ui/Card';
+import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/Card';
 import { Button } from '../../../components/ui/Button';
 import { Input } from '../../../components/ui/Input';
-import { Plus, Trash2, Save, BookOpen, HelpCircle, CheckCircle, ChevronDown, Search } from 'lucide-react';
+import { Plus, Trash2, Save, BookOpen, HelpCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { Course, Lesson } from '../../../types';
+import { Course } from '../../../types';
 import api from '../../../lib/axios';
 import { CustomSelect } from '../../../components/ui/CustomSelect';
 
@@ -24,7 +24,7 @@ export default function QuizBuilder() {
   const [selectedCourseId, setSelectedCourseId] = useState('');
   const [questions, setQuestions] = useState<Question[]>([]);
   const [courses, setCourses] = useState<Course[]>([]);
-  const [loadingCourses, setLoadingCourses] = useState(false);
+  const [, setLoadingCourses] = useState(false);
 
   useEffect(() => {
     const fetchCoursesList = async () => {
@@ -53,18 +53,18 @@ export default function QuizBuilder() {
     toast.success('Question removed');
   };
 
-  const updateQuestion = (index: number, field: string, value: any) => {
+  const updateQuestion = (index: number, field: string, value: string | string[] | number[]) => {
     const newQuestions = [...questions];
     if (field === 'question') {
-      newQuestions[index].question = value;
+      newQuestions[index].question = value as string;
     } else if (field === 'option') {
-      newQuestions[index].options = value;
+      newQuestions[index].options = value as string[];
     } else if (field === 'type') {
-      newQuestions[index].type = value;
+      newQuestions[index].type = value as 'single' | 'multiple';
       // Reset correct answers when switching types to avoid single-type questions with multiple correct answers
       newQuestions[index].correctAnswers = [0];
     } else if (field === 'correctAnswers') {
-      newQuestions[index].correctAnswers = value;
+      newQuestions[index].correctAnswers = value as number[];
     }
     setQuestions(newQuestions);
   };
@@ -118,9 +118,10 @@ export default function QuizBuilder() {
       setTitle('');
       setSelectedCourseId('');
       setQuestions([]);
-    } catch (error: any) {
-      console.error('Error creating quiz:', error);
-      const errorMessage = error.response?.data?.error || error.response?.data?.message || error.message || 'Failed to create quiz';
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { error?: string; message?: string } }; message?: string };
+      console.error('Error creating quiz:', err);
+      const errorMessage = err.response?.data?.error || err.response?.data?.message || err.message || 'Failed to create quiz';
       toast.error(errorMessage);
     }
   };

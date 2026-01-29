@@ -14,6 +14,7 @@ export function AdminSidebar() {
         { id: 'analytics', label: 'Analytics', icon: TrendingUp, href: '/admin/analytics' },
         { id: 'courses', label: 'Admin Courses', icon: BookOpen, href: '/admin/courses' },
         { id: 'tutors', label: 'Manage Tutors', icon: Users, href: '/admin/tutors' },
+        { id: 'users', label: 'Manage Users', icon: Users, href: '/admin/users' },
         { id: 'quiz', label: 'Create Quiz', icon: Plus, href: '/admin/quiz' },
         { id: 'notices', label: 'Notice Board', icon: Megaphone, href: '/admin/notices' },
     ];
@@ -39,7 +40,7 @@ export function AdminSidebar() {
             {/* Sidebar */}
             <div className={`
                 fixed lg:relative inset-y-0 left-0 z-40
-                w-64 bg-card/30 backdrop-blur-2xl border-r border-white/10 min-h-screen transition-all duration-500 transform
+                w-64 bg-card/30 backdrop-blur-2xl border-r border-white/10 min-h-screen transition-all duration-500 transform overflow-y-auto
                 ${isOpen ? 'translate-x-0 shadow-[0_0_50px_rgba(0,0,0,0.5)]' : '-translate-x-full lg:translate-x-0'}
             `}>
                 <div className="p-4">

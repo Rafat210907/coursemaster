@@ -3,8 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState, AppDispatch } from '../../store/store';
-import Link from 'next/link';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../../components/ui/Card';
+import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/Card';
 import { Button } from '../../../components/ui/Button';
 import { Megaphone, Clock, User, ChevronRight, X } from 'lucide-react';
 import api from '../../../lib/axios';
@@ -112,7 +111,7 @@ export default function StudentNotices() {
                                         </CardHeader>
                                         <CardContent className="pt-4">
                                             <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap text-lg line-clamp-2 italic">
-                                                "{notice.content}"
+                                                &quot;{notice.content}&quot;
                                             </p>
 
                                             <div className="mt-8 pt-6 border-t border-white/5 flex items-center justify-between">

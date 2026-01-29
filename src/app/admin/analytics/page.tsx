@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchAnalytics } from '../../store/slices/adminSlice';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../components/ui/Card';
 import { RootState, AppDispatch } from '../../store/store';
-import { Users, BookOpen, UserCheck, TrendingUp, Award, Search, DollarSign } from 'lucide-react';
+import { Users, UserCheck, TrendingUp, Award, Search, DollarSign } from 'lucide-react';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
   LineChart, Line, ResponsiveContainer, AreaChart, Area
@@ -33,20 +33,6 @@ export default function AdminAnalytics() {
       </div>
     );
   }
-
-  const CustomTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className="bg-background/95 backdrop-blur-sm border border-border p-3 rounded-xl shadow-xl">
-          <p className="text-sm font-semibold">{label}</p>
-          <p className="text-sm text-primary">
-            {payload[0].name}: {payload[0].value}
-          </p>
-        </div>
-      );
-    }
-    return null;
-  };
 
   if (loading) {
     return (
@@ -400,3 +386,17 @@ export default function AdminAnalytics() {
     </div>
   );
 }
+
+const CustomTooltip = ({ active, payload, label }: { active?: boolean, payload?: Array<{ name?: string, value?: number }>, label?: string }) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-background/95 backdrop-blur-sm border border-border p-3 rounded-xl shadow-xl">
+        <p className="text-sm font-semibold">{label}</p>
+        <p className="text-sm text-primary">
+          {payload[0].name ? `${payload[0].name}: ` : ''}{payload[0].value}
+        </p>
+      </div>
+    );
+  }
+  return null;
+};

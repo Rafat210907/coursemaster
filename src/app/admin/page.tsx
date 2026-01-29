@@ -1,13 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchAnalytics } from '../store/slices/adminSlice';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/Card';
 import { RootState, AppDispatch } from '../store/store';
-import { Users, BookOpen, UserCheck, TrendingUp, BarChart3, Plus } from 'lucide-react';
+import { Users, BookOpen, UserCheck, TrendingUp } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, LineChart, Line, ResponsiveContainer } from 'recharts';
-import Link from 'next/link';
 
 import { AdminSidebar } from '../../components/AdminSidebar';
 
@@ -15,7 +14,6 @@ export default function AdminDashboard() {
   const dispatch = useDispatch<AppDispatch>();
   const { analytics, loading, error } = useSelector((state: RootState) => state.admin);
   const { user } = useSelector((state: RootState) => state.auth);
-  const [activeTab, setActiveTab] = useState('analytics');
 
   useEffect(() => {
     if (user?.role === 'admin') {
@@ -34,12 +32,6 @@ export default function AdminDashboard() {
     );
   }
 
-  const sidebarItems = [
-    { id: 'analytics', label: 'Analytics', icon: BarChart3, active: true },
-    { id: 'courses', label: 'Admin Courses', icon: BookOpen, href: '/admin/courses' },
-    { id: 'tutors', label: 'Manage Tutors', icon: Users, href: '/admin/tutors' },
-    { id: 'quiz', label: 'Create Quiz', icon: Plus, href: '/admin/quiz' },
-  ];
 
   return (
     <div className="min-h-screen bg-background">

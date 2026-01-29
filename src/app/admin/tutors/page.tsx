@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui
 import { Button } from '../../../components/ui/Button';
 import { Input } from '../../../components/ui/Input';
 import { RootState, AppDispatch } from '../../store/store';
-import { Tutor } from '../../../types';
+import { Tutor, Course } from '../../../types';
 import Image from 'next/image';
 import { Plus, Edit, Trash2, User, Users, Award, BookOpen } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -282,7 +282,7 @@ export default function AdminTutors() {
                       <CardContent className="relative z-10">
                         <div className="space-y-4">
                           {tutor.bio && (
-                            <p className="text-sm text-muted-foreground line-clamp-2 italic border-l-2 border-primary/20 pl-3">"{tutor.bio}"</p>
+                            <p className="text-sm text-muted-foreground line-clamp-2 italic border-l-2 border-primary/20 pl-3">&quot;{tutor.bio}&quot;</p>
                           )}
 
                           <div className="flex flex-wrap gap-1">
@@ -306,12 +306,12 @@ export default function AdminTutors() {
                             <h4 className="text-[10px] uppercase font-black text-muted-foreground/50 tracking-widest mb-3">Assigned Courses</h4>
                             <div className="space-y-2 max-h-40 overflow-y-auto select-scrollbar pr-1">
                               {tutor.courses && tutor.courses.length > 0 ? (
-                                tutor.courses.map((course: any, idx: number) => (
+                                tutor.courses.map((course: string | Course, idx: number) => (
                                   <div key={idx} className="flex items-center gap-2 bg-white/5 hover:bg-white/10 p-2 rounded-xl transition-all border border-white/5 group/course">
                                     <div className="p-1.5 bg-primary/20 rounded-lg group-hover/course:bg-primary/30 transition-colors">
                                       <BookOpen size={12} className="text-primary" />
                                     </div>
-                                    <span className="text-xs font-semibold line-clamp-1 group-hover/course:text-primary transition-colors">{typeof course === 'object' ? course.title : 'Course ID: ' + course}</span>
+                                    <span className="text-xs font-semibold line-clamp-1 group-hover/course:text-primary transition-colors">{typeof course === 'object' ? (course as Course).title : 'Course ID: ' + course}</span>
                                   </div>
                                 ))
                               ) : (

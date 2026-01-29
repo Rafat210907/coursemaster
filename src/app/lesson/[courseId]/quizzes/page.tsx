@@ -6,8 +6,8 @@ import { useSelector } from 'react-redux';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../../../components/ui/Card';
 import { Button } from '../../../../components/ui/Button';
 import { RootState } from '../../../store/store';
-import { Quiz, Course, Lesson, Assignment } from '../../../../types';
-import { HelpCircle, ArrowLeft, CheckCircle, GraduationCap } from 'lucide-react';
+import { Quiz, Course } from '../../../../types';
+import { HelpCircle, ArrowLeft, CheckCircle, GraduationCap, XCircle, Layout } from 'lucide-react';
 import api from '../../../../lib/axios';
 import toast from 'react-hot-toast';
 
@@ -22,7 +22,7 @@ export default function CourseQuizzes() {
     const [course, setCourse] = useState<Course | null>(null);
 
     const [selectedQuizId, setSelectedQuizId] = useState<string | null>(null);
-    const [quizStates, setQuizStates] = useState<Record<string, { answers: (number | number[])[], submitted: boolean, score: number }>>({});
+    const [quizStates, setQuizStates] = useState<Record<string, { answers: (number | number[])[], submitted: boolean, score: number, reviewMode: boolean }>>({});
 
     useEffect(() => {
         const fetchData = async () => {
@@ -37,12 +37,17 @@ export default function CourseQuizzes() {
                 setQuizzes(fetchedQuizzes);
 
                 // Initialize states for each quiz
-                const initialStates: Record<string, { answers: (number | number[])[], submitted: boolean, score: number }> = {};
+                const initialStates: Record<string, { answers: (number | number[])[], submitted: boolean, score: number, reviewMode: boolean }> = {};
                 fetchedQuizzes.forEach((q: Quiz) => {
+                    const submission = q.submissions?.find(s =>
+                        (typeof s.student === 'string' ? s.student : s.student?._id) === user?._id
+                    );
+
                     initialStates[q._id] = {
-                        answers: q.questions.map(question => question.type === 'multiple' ? [] : -1),
-                        submitted: false,
-                        score: 0
+                        answers: submission ? submission.answers : q.questions.map(question => question.type === 'multiple' ? [] : -1),
+                        submitted: !!submission,
+                        score: submission ? submission.score : 0,
+                        reviewMode: !!submission
                     };
                 });
                 setQuizStates(initialStates);
@@ -59,7 +64,7 @@ export default function CourseQuizzes() {
         };
 
         fetchData();
-    }, [courseId]);
+    }, [courseId, user]);
 
     const handleQuizSubmit = async (quizId: string) => {
         const currentState = quizStates[quizId];
@@ -75,13 +80,15 @@ export default function CourseQuizzes() {
                 [quizId]: {
                     ...prev[quizId],
                     submitted: true,
-                    score: response.data.score
+                    score: response.data.score,
+                    reviewMode: true
                 }
             }));
             toast.success('Quiz submitted successfully!');
-        } catch (err: any) {
-            console.error('Error submitting quiz:', err);
-            toast.error(err.response?.data?.message || err.response?.data?.error || 'Failed to submit quiz');
+        } catch (err: unknown) {
+            const error = err as { response?: { data?: { message?: string; error?: string } } };
+            console.error('Error submitting quiz:', error);
+            toast.error(error.response?.data?.message || error.response?.data?.error || 'Failed to submit quiz');
         }
     };
 
@@ -112,18 +119,15 @@ export default function CourseQuizzes() {
         });
     };
 
-    const resetQuiz = (quizId: string) => {
-        setQuizStates(prev => {
-            const quiz = quizzes.find(q => q._id === quizId);
-            return {
-                ...prev,
-                [quizId]: {
-                    answers: quiz ? quiz.questions.map(question => question.type === 'multiple' ? [] : -1) : [],
-                    submitted: false,
-                    score: 0
-                }
-            };
-        });
+
+    const toggleReviewMode = (quizId: string) => {
+        setQuizStates(prev => ({
+            ...prev,
+            [quizId]: {
+                ...prev[quizId],
+                reviewMode: !prev[quizId].reviewMode
+            }
+        }));
     };
 
     if (loading) {
@@ -226,63 +230,105 @@ export default function CourseQuizzes() {
                                         </div>
                                     </CardHeader>
                                     <CardContent className="p-8">
-                                        {!selectedState.submitted ? (
+                                        {!selectedState.submitted || !selectedState.reviewMode ? (
                                             <div className="space-y-10">
-                                                {selectedQuiz.questions.map((question, qIndex) => (
-                                                    <div key={qIndex} className="p-8 rounded-2xl bg-muted/30 border border-muted-foreground/10 transition-all hover:bg-muted/40">
-                                                        <div className="flex justify-between items-start mb-6">
-                                                            <h3 className="text-xl font-bold flex gap-4 pr-10">
-                                                                <span className="text-primary opacity-50 shrink-0">0{qIndex + 1}</span>
-                                                                {question.question}
-                                                            </h3>
-                                                            {question.type === 'multiple' && (
-                                                                <span className="text-[10px] font-black uppercase tracking-tighter bg-primary/10 text-primary px-2 py-1 rounded">Multiple Choice</span>
-                                                            )}
-                                                        </div>
-                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                            {question.options.map((option, oIndex) => {
-                                                                const isSelected = question.type === 'multiple'
-                                                                    ? (selectedState.answers[qIndex] as number[]).includes(oIndex)
-                                                                    : selectedState.answers[qIndex] === oIndex;
-                                                                return (
-                                                                    <button
-                                                                        key={oIndex}
-                                                                        onClick={() => updateAnswers(selectedQuiz._id, qIndex, oIndex)}
-                                                                        className={`flex items-center p-5 rounded-xl border-2 text-left transition-all duration-300 relative overflow-hidden ${isSelected
-                                                                            ? 'border-primary bg-primary/10 text-primary shadow-md'
-                                                                            : 'border-transparent bg-background hover:border-primary/30 hover:bg-primary/5'
-                                                                            }`}
-                                                                    >
-                                                                        {isSelected && (
-                                                                            <div className="absolute top-0 right-0 p-2">
-                                                                                <div className="w-4 h-4 rounded-full bg-primary flex items-center justify-center">
-                                                                                    <CheckCircle className="h-3 w-3 text-white" />
+                                                {selectedQuiz.questions.map((question, qIndex) => {
+                                                    const isReview = selectedState.submitted && selectedState.reviewMode;
+
+                                                    return (
+                                                        <div key={qIndex} className={`p-8 rounded-2xl border transition-all ${isReview ? 'bg-card' : 'bg-muted/30 hover:bg-muted/40 border-muted-foreground/10'
+                                                            }`}>
+                                                            <div className="flex justify-between items-start mb-6">
+                                                                <h3 className="text-xl font-bold flex gap-4 pr-10">
+                                                                    <span className="text-primary opacity-50 shrink-0">0{qIndex + 1}</span>
+                                                                    {question.question}
+                                                                </h3>
+                                                                <div className="flex flex-col items-end gap-2">
+                                                                    {question.type === 'multiple' && (
+                                                                        <span className="text-[10px] font-black uppercase tracking-tighter bg-primary/10 text-primary px-2 py-1 rounded">Multiple Choice</span>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                                {question.options.map((option, oIndex) => {
+                                                                    const isSelected = question.type === 'multiple'
+                                                                        ? (selectedState.answers[qIndex] as number[]).includes(oIndex)
+                                                                        : selectedState.answers[qIndex] === oIndex;
+
+                                                                    const correctIndices = question.correctAnswers || (question.correctAnswer !== undefined ? [question.correctAnswer] : []);
+                                                                    const isCorrect = correctIndices.includes(oIndex);
+
+                                                                    let buttonStyles = "border-transparent bg-background hover:border-primary/30 hover:bg-primary/5";
+                                                                    let icon = null;
+
+                                                                    if (isReview) {
+                                                                        if (isCorrect && isSelected) {
+                                                                            buttonStyles = "border-green-500 bg-green-500/10 text-green-600 shadow-md";
+                                                                            icon = <CheckCircle className="h-4 w-4 text-green-600" />;
+                                                                        } else if (isCorrect && !isSelected) {
+                                                                            buttonStyles = "border-green-500/50 bg-green-500/5 text-green-600/70 border-dashed";
+                                                                            icon = <CheckCircle className="h-4 w-4 text-green-600/50" />;
+                                                                        } else if (!isCorrect && isSelected) {
+                                                                            buttonStyles = "border-red-500 bg-red-500/10 text-red-600 shadow-md";
+                                                                            icon = <XCircle className="h-4 w-4 text-red-600" />;
+                                                                        }
+                                                                    } else if (isSelected) {
+                                                                        buttonStyles = "border-primary bg-primary/10 text-primary shadow-md";
+                                                                    }
+
+                                                                    return (
+                                                                        <button
+                                                                            key={oIndex}
+                                                                            disabled={isReview}
+                                                                            onClick={() => updateAnswers(selectedQuiz._id, qIndex, oIndex)}
+                                                                            className={`flex items-center p-5 rounded-xl border-2 text-left transition-all duration-300 relative overflow-hidden ${buttonStyles}`}
+                                                                        >
+                                                                            {icon && <div className="absolute top-2 right-2">{icon}</div>}
+                                                                            {!icon && isSelected && !isReview && (
+                                                                                <div className="absolute top-0 right-0 p-2">
+                                                                                    <div className="w-4 h-4 rounded-full bg-primary flex items-center justify-center">
+                                                                                        <CheckCircle className="h-3 w-3 text-white" />
+                                                                                    </div>
                                                                                 </div>
-                                                                            </div>
-                                                                        )}
-                                                                        <span className={`flex items-center justify-center h-8 w-8 rounded-lg text-sm font-black mr-4 transition-colors ${isSelected ? 'bg-primary text-white' : 'bg-muted text-muted-foreground'
-                                                                            }`}>
-                                                                            {String.fromCharCode(65 + oIndex)}
-                                                                        </span>
-                                                                        <span className="font-semibold">{option}</span>
-                                                                    </button>
-                                                                );
-                                                            })}
+                                                                            )}
+                                                                            <span className={`flex items-center justify-center h-8 w-8 rounded-lg text-sm font-black mr-4 transition-colors ${isSelected ? (isReview ? (isCorrect ? 'bg-green-500 text-white' : 'bg-red-500 text-white') : 'bg-primary text-white') : 'bg-muted text-muted-foreground'
+                                                                                }`}>
+                                                                                {String.fromCharCode(65 + oIndex)}
+                                                                            </span>
+                                                                            <span className="font-semibold">{option}</span>
+                                                                        </button>
+                                                                    );
+                                                                })}
+                                                            </div>
                                                         </div>
+                                                    );
+                                                })}
+
+                                                {!selectedState.submitted && (
+                                                    <div className="pt-6">
+                                                        <Button
+                                                            onClick={() => handleQuizSubmit(selectedQuiz._id)}
+                                                            disabled={selectedState.answers.some(ans => Array.isArray(ans) ? ans.length === 0 : ans === -1)}
+                                                            className="w-full h-16 text-xl font-black rounded-2xl shadow-xl shadow-primary/30 transition-all hover:scale-[1.01] active:scale-[0.98]"
+                                                        >
+                                                            Submit Assessment
+                                                        </Button>
+                                                        <p className="text-center text-xs text-muted-foreground mt-4 italic">
+                                                            Please answer all questions before submitting.
+                                                        </p>
                                                     </div>
-                                                ))}
-                                                <div className="pt-6">
-                                                    <Button
-                                                        onClick={() => handleQuizSubmit(selectedQuiz._id)}
-                                                        disabled={selectedState.answers.some(ans => Array.isArray(ans) ? ans.length === 0 : ans === -1)}
-                                                        className="w-full h-16 text-xl font-black rounded-2xl shadow-xl shadow-primary/30 transition-all hover:scale-[1.01] active:scale-[0.98]"
-                                                    >
-                                                        Submit Assessment
-                                                    </Button>
-                                                    <p className="text-center text-xs text-muted-foreground mt-4 italic">
-                                                        Please answer all questions before submitting.
-                                                    </p>
-                                                </div>
+                                                )}
+
+                                                {selectedState.submitted && (
+                                                    <div className="pt-6">
+                                                        <Button
+                                                            onClick={() => toggleReviewMode(selectedQuiz._id)}
+                                                            className="w-full h-14 text-lg font-bold rounded-xl"
+                                                        >
+                                                            Return to Completion Screen
+                                                        </Button>
+                                                    </div>
+                                                )}
                                             </div>
                                         ) : (
                                             <div className="text-center py-12 max-w-2xl mx-auto">
@@ -302,17 +348,17 @@ export default function CourseQuizzes() {
                                                             ? "Outstanding effort! You've successfully mastered all recording concepts in this section."
                                                             : selectedState.score >= selectedQuiz.questions.length / 2
                                                                 ? "Strong work! You clearly understand the core principles, though there's still room for minor refinement."
-                                                                : "Don't be discouraged. Learning is an iterative process. We recommend reviewing the lesson material and giving it another shot."}
+                                                                : "Don't be discouraged. Learning is an iterative process. Review your answers to see where you can improve."}
                                                     </p>
                                                 </div>
 
                                                 <div className="flex flex-col sm:flex-row gap-4 items-center justify-center">
                                                     <Button
-                                                        variant="outline"
-                                                        className="h-14 px-10 rounded-xl font-bold border-2"
-                                                        onClick={() => resetQuiz(selectedQuiz._id)}
+                                                        className="h-14 px-10 rounded-xl font-bold border-2 flex items-center gap-2"
+                                                        onClick={() => toggleReviewMode(selectedQuiz._id)}
                                                     >
-                                                        Retake Assessment
+                                                        <Layout className="h-5 w-5" />
+                                                        Review My Answers
                                                     </Button>
                                                 </div>
                                             </div>

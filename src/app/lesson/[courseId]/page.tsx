@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../..
 import { Button } from '../../../components/ui/Button';
 import { RootState, AppDispatch } from '../../store/store';
 import { Lesson, Assignment, Quiz } from '../../../types';
-import { Play, CheckCircle, FileText, HelpCircle, ArrowRight, GraduationCap } from 'lucide-react';
+import { Play, CheckCircle, FileText, ArrowRight, GraduationCap } from 'lucide-react';
 
 import api from '../../../lib/axios';
 
@@ -30,9 +30,6 @@ export default function LessonPage() {
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
   const [loading, setLoading] = useState(true);
-  const [quizAnswers, setQuizAnswers] = useState<number[]>([]);
-  const [quizSubmitted, setQuizSubmitted] = useState(false);
-  const [quizScore, setQuizScore] = useState(0);
 
   const enrollment = enrollments.find(e => (e.course && typeof e.course === 'object' ? e.course._id : e.course) === courseId);
 
@@ -75,18 +72,6 @@ export default function LessonPage() {
     }
   };
 
-  const handleQuizSubmit = async (quizId: string) => {
-    try {
-      const response = await api.post('/quizzes/submit', {
-        quizId,
-        answers: quizAnswers
-      });
-      setQuizScore(response.data.score);
-      setQuizSubmitted(true);
-    } catch (error) {
-      console.error('Error submitting quiz:', error);
-    }
-  };
 
   const isLessonCompleted = (lessonId: string) => {
     return enrollment?.completedLessons.some(cl => cl.lesson === lessonId) || false;
@@ -152,8 +137,6 @@ export default function LessonPage() {
                       key={lesson._id}
                       onClick={() => {
                         setSelectedLesson(lesson);
-                        setQuizSubmitted(false);
-                        setQuizAnswers([]);
                       }}
                       className={`w-full text-left p-3 rounded-lg transition-colors ${selectedLesson?._id === lesson._id
                         ? 'bg-primary text-primary-foreground'
