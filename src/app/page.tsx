@@ -116,7 +116,7 @@ export default function Home() {
                 Experience world-class education from industry giants. Start your journey today and accelerate your career path with CourseMaster.
               </p>
               <div className="flex flex-wrap gap-4">
-                <Link href="#courses">
+                <Link href="/courses">
                   <Button size="lg" className="h-14 px-8 rounded-2xl text-lg font-bold shadow-neon hover:shadow-neon-glow transition-all duration-300">
                     Explore Courses
                     <ArrowRight className="ml-2 h-5 w-5" />

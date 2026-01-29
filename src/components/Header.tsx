@@ -84,6 +84,11 @@ export default function Header() {
             <span>Home</span>
           </Link>
 
+          <Link href="/courses" className="flex items-center space-x-1.5 text-base font-medium hover:text-primary transition-colors" prefetch={false}>
+            <BookOpen className="h-5 w-5" />
+            <span>Courses</span>
+          </Link>
+
           {user ? (
             <>
               <Link href="/dashboard" className="flex items-center space-x-1.5 text-base font-medium hover:text-primary transition-colors" prefetch={false}>
@@ -268,6 +273,16 @@ export default function Header() {
             >
               <Home className="h-5 w-5" />
               <span className="font-medium">Home</span>
+            </Link>
+
+            <Link
+              href="/courses"
+              onClick={() => setIsMenuOpen(false)}
+              className="flex items-center space-x-2 p-2 rounded-md hover:bg-accent transition-colors"
+              prefetch={false}
+            >
+              <BookOpen className="h-5 w-5" />
+              <span className="font-medium">Courses</span>
             </Link>
 
             {user ? (
